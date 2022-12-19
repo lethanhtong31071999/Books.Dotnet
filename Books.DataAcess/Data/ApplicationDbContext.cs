@@ -10,5 +10,10 @@ namespace Books.Data
         }
 
         public DbSet<Category> Categories { get; set; }
+
+        internal void AddRange<T>(T entities)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

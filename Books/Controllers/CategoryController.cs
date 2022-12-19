@@ -15,6 +15,7 @@ namespace Books.Controllers
         public IActionResult Index()
         {
             IEnumerable<Category> categories = _db.Categories.ToList();
+            //DbSet<Category> test = _db.Set<Category>();
             return View(categories);
         }
 
