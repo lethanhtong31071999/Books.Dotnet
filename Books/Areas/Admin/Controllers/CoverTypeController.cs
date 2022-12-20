@@ -15,7 +15,7 @@ namespace Books.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            var coverTypes = _unit.CoverRepo.GetAll().AsEnumerable<CoverType>();
+            var coverTypes = _unit.CoverTypeRepo.GetAll().AsEnumerable<CoverType>();
             return View(coverTypes);
         }
 
@@ -31,7 +31,7 @@ namespace Books.Areas.Admin.Controllers
         public IActionResult Create(CoverType obj)
         {
             if(!ModelState.IsValid) return View(obj);
-            _unit.CoverRepo.Add(obj);
+            _unit.CoverTypeRepo.Add(obj);
             _unit.Save();
             TempData["success"] = "Cover type was created successfully!";
             return RedirectToAction("Index", "CoverType");
@@ -41,7 +41,7 @@ namespace Books.Areas.Admin.Controllers
         public IActionResult Delete(int? id)
         {
             if (id == 0 || id == null) return NotFound();
-            var obj = _unit.CoverRepo.GetFirstOrDefault(obj => obj.Id == id);
+            var obj = _unit.CoverTypeRepo.GetFirstOrDefault(obj => obj.Id == id);
             if (obj != null) return View(obj);
             return View();
         }
@@ -50,10 +50,10 @@ namespace Books.Areas.Admin.Controllers
         public IActionResult Delete(int? id, bool trashParam = true)
         {
             if (id == 0 || id == null) return View();
-            var entity = _unit.CoverRepo.GetFirstOrDefault(x => x.Id == id);
+            var entity = _unit.CoverTypeRepo.GetFirstOrDefault(x => x.Id == id);
             if (entity != null)
             {
-                _unit.CoverRepo.Remove(entity);
+                _unit.CoverTypeRepo.Remove(entity);
                 _unit.Save();
                 TempData["success"] = "Cover type was deleted successfully!";
                 return RedirectToAction("Index", "CoverType");
@@ -66,7 +66,7 @@ namespace Books.Areas.Admin.Controllers
         public IActionResult Update(int? id)
         {
             if (id == null || id == 0) return View();
-            var entity = _unit.CoverRepo.GetFirstOrDefault(x => x.Id == id);
+            var entity = _unit.CoverTypeRepo.GetFirstOrDefault(x => x.Id == id);
             return entity != null ? View(entity) : View();
         }
         [HttpPost]
@@ -74,15 +74,10 @@ namespace Books.Areas.Admin.Controllers
         public IActionResult Update(CoverType obj)
         {
             if (!ModelState.IsValid) return View(obj);
-            var entity = _unit.CoverRepo.GetFirstOrDefault(x => x.Id == obj.Id);
-            if (entity != null)
-            {
-                entity.Name = obj.Name;
-                _unit.Save();
-                TempData["success"] = "Cover type was updated successfully!";
-                return RedirectToAction("Index", "CoverType");
-            }
-            return View();
+            _unit.CoverTypeRepo.Update(obj);
+            _unit.Save();
+            TempData["success"] = "Cover type was updated successfully!";
+            return RedirectToAction("Index", "CoverType");
         }
     }
 }

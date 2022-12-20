@@ -10,7 +10,7 @@ namespace Books.DataAcess.Repository.IRepository
     public interface IRepository<T> where T : class
     {
         // Get
-        T GetFirstOrDefault(Expression<Func<T, bool>> filter);
+        T GetFirstOrDefault(Expression<Func<T, bool>> filter, bool isTrack = true);
         IEnumerable<T> GetAll();
 
         // Add

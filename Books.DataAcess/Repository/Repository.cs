@@ -39,11 +39,11 @@ namespace Books.DataAcess.Repository
             return query;
         }
 
-        public T GetFirstOrDefault(Expression<Func<T, bool>> filter)
+        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, bool isTrack = true)
         {
             IQueryable<T> query = _dbSet;
-            query = query.Where(filter);
-            return query.FirstOrDefault();
+            query = isTrack ? query.Where(filter) : query.Where(filter).AsNoTracking();
+            return query.FirstOrDefault<T>();
         }
 
         public void Remove(T entity)

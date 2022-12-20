@@ -1,6 +1,7 @@
 ﻿using Books.Data;
 using Books.DataAcess.Repository.IRepository;
 using Books.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,15 @@ namespace Books.DataAcess.Repository
         {
             _db = db;
         }
-        public void Update(Category entity)
+        public void Update(Category obj)
         {
-            //_db.Categories.Update(entity);
-            _db.Set<Category>().Update(entity);
+            var objFromDba = base.GetFirstOrDefault(x => x.Id == obj.Id, isTrack: false);
+            if(objFromDba != null)
+            {
+                objFromDba.Name = obj.Name;
+                objFromDba.DisplayOrder = obj.DisplayOrder;
+                _db.Set<Category>().Update(objFromDba);
+            }
         }
     }
 }

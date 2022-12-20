@@ -12,12 +12,12 @@ namespace Books.DataAcess.Repository
     {
         private readonly ApplicationDbContext _db;
         public ICategoryRepo CategoryRepo { get; private set; }
-        public ICoverTypeRepo CoverRepo { get; private set; }
+        public ICoverTypeRepo CoverTypeRepo { get; private set; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
             CategoryRepo = new CategoryRepo(_db);
-            CoverRepo = new CoverTypeRepo(_db);
+            CoverTypeRepo = new CoverTypeRepo(_db);
         }
 
         public void Save()
