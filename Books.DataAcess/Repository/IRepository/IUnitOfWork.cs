@@ -10,7 +10,7 @@ namespace Books.DataAcess.Repository
     public interface IUnitOfWork
     {
         public ICategoryRepo CategoryRepo { get; }
-        public ICoverTypeRepo CoverRepo { get; }
+        public ICoverTypeRepo CoverTypeRepo { get; }
         public void Save();
     }
 }

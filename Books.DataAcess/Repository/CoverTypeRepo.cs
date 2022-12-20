@@ -1,6 +1,7 @@
 ﻿using Books.Data;
 using Books.DataAcess.Repository.IRepository;
 using Books.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,14 @@ namespace Books.DataAcess.Repository
         {
             _db = db;
         }
-        public void Update(CoverType entity)
+        public void Update(CoverType obj)
         {
-            _db.Update(entity);
+            var objFromDba = base.GetFirstOrDefault(x => x.Id == obj.Id, isTrack:false);
+            if(objFromDba != null)
+            {
+                objFromDba.Name = obj.Name;
+                _db.Update(objFromDba);
+            }
         }
     }
 }
