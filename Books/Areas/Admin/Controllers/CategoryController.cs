@@ -56,10 +56,10 @@ namespace Books.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(Category c)
+        public IActionResult Update(Category obj)
         {
-            if (c == null) return View(c);
-            _unit.CategoryRepo.Update(c);
+            if (obj == null) return View(obj);
+            _unit.CategoryRepo.Update(obj);
             _unit.Save();
             TempData["success"] = "Category was updated successfully!";
             return RedirectToAction("Index", "Category");
