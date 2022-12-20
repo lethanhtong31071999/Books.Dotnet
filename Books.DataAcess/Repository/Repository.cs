@@ -36,8 +36,7 @@ namespace Books.DataAcess.Repository
         public IEnumerable<T> GetAll()
         {
             IQueryable<T> query = _dbSet;
-            //return query.AsEnumerable<T>();
-            return _dbSet.AsEnumerable<T>();
+            return query;
         }
 
         public T GetFirstOrDefault(Expression<Func<T, bool>> filter)

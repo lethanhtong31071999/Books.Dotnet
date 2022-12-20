@@ -1,4 +1,5 @@
-﻿using Books.Models;
+﻿using Books.Model;
+using Books.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Books.Data
@@ -11,9 +12,6 @@ namespace Books.Data
 
         public DbSet<Category> Categories { get; set; }
 
-        internal void AddRange<T>(T entities)
-        {
-            throw new NotImplementedException();
-        }
+        public DbSet<CoverType> CoverTypes { get; set; }
     }
 }

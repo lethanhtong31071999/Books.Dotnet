@@ -1,4 +1,6 @@
 ﻿using Books.Data;
+using Books.DataAcess.Repository;
+using Books.DataAcess.Repository.IRepository;
 using Books.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,15 +9,14 @@ namespace Books.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public CategoryController(ApplicationDbContext db)
+        private readonly IUnitOfWork _unit;
+        public CategoryController(IUnitOfWork unit)
         {
-            _db = db;
+            _unit = unit;
         }
         public IActionResult Index()
         {
-            IEnumerable<Category> categories = _db.Categories.ToList();
-            //DbSet<Category> test = _db.Set<Category>();
+            var categories = _unit.CategoryRepo.GetAll().ToList();
             return View(categories);
         }
 
@@ -35,8 +36,8 @@ namespace Books.Controllers
             }
             if(ModelState.IsValid)
             {
-                _db.Categories.Add(obj);
-                _db.SaveChanges();
+                _unit.CategoryRepo.Add(obj);
+                _unit.Save();
                 TempData["success"] = "Category was deleted successfully!";
                 return RedirectToAction("Index");
             }
@@ -47,7 +48,7 @@ namespace Books.Controllers
         public IActionResult Update(int? id)
         {
             if(id == null || id == 0) return NotFound();
-            var model = _db.Categories.AsNoTracking().FirstOrDefault<Category>(obj => obj.Id == id);
+            var model = _unit.CategoryRepo.GetFirstOrDefault(obj => obj.Id == id);
             if(model == null) return NotFound();
             return View(model);
         }
@@ -57,8 +58,8 @@ namespace Books.Controllers
         public IActionResult Update(Category c)
         {
             if (c == null) return View(c);
-            _db.Categories.Update(c);
-            _db.SaveChanges();
+            _unit.CategoryRepo.Update(c);
+            _unit.Save();
             TempData["success"] = "Category was updated successfully!";
             return RedirectToAction("Index", "Category");
         }
@@ -67,7 +68,7 @@ namespace Books.Controllers
         public IActionResult Delete(int? id)
         {
             if (id == 0 || id == null) return NotFound();
-            var obj = _db.Categories.FirstOrDefault<Category>(c => c.Id == id);
+            var obj = _unit.CategoryRepo.GetFirstOrDefault(obj => obj.Id == id);
             if (obj != null) return View(obj);
             return NotFound();
         }
@@ -77,11 +78,11 @@ namespace Books.Controllers
         public IActionResult Delete(int? id, bool none = true)
         {
             if (id == 0 || id == null) return NotFound();
-            var obj = _db.Categories.FirstOrDefault<Category>(c => c.Id == id);
+            var obj = _unit.CategoryRepo.GetFirstOrDefault(c => c.Id == id);
             if (obj != null)
             {
-                _db.Categories.Remove(obj);
-                _db.SaveChanges();
+                _unit.CategoryRepo.Remove(obj);
+                _unit.Save();
                 TempData["success"] = "Category was deleted successfully!";
                 return RedirectToAction("Index", "Category");
             }
