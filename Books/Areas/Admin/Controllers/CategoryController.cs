@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Books.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unit;
