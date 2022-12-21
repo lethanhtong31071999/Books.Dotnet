@@ -48,7 +48,7 @@ namespace Books.Model
         public double Price100 { get; set; }
 
         [ValidateNever]
-        public string ImageUrl { get; set; }
+        public string ImageUrl { get; set; } = "";
 
         [Required]
         [Display(Name = "Category")]
@@ -61,7 +61,7 @@ namespace Books.Model
         [Display(Name = "Cover Type")]
         public int CoverTypeId { get; set; }
         [ValidateNever]
-        [ForeignKey("CategoryId")]
+        [ForeignKey("CoverTypeId")]
         public CoverType CoverType { get; set; }
     }
 }
