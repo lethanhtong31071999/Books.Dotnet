@@ -1,0 +1,75 @@
+﻿@model Product
+<form method="post" asp-area="Admin" asp-action="Upsert" asp-controller="Product">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary text-center">@(Model.Id == 0 ? "Create Product": "Update Product")</h2>
+            <hr />
+        </div>
+
+        <div asp-validation-summary=All></div>
+        <div class="mb-3">
+            <label asp-for="Title"></label>
+            <input asp-for="Title" class="form-control" />
+            <span class="text-danger" asp-validation-for="Title"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+            <span class="text-danger" asp-validation-for="Description"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="ISBN"></label>
+            <input asp-for="ISBN" class="form-control" />
+            <span class="text-danger" asp-validation-for="ISBN"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Author"></label>
+            <input asp-for="Author" class="form-control" />
+            <span class="text-danger" asp-validation-for="Author"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="ListPrice"></label>
+            <input asp-for="ListPrice" class="form-control" />
+            <span class="text-danger" asp-validation-for="ListPrice"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Price"></label>
+            <input type="number" asp-for="Price" class="form-control" />
+            <span class="text-danger" asp-validation-for="Price"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Price50"></label>
+            <input type="number" asp-for="Price50" class="form-control" />
+            <span class="text-danger" asp-validation-for="Price50"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Price100"></label>
+            <input type="number" asp-for="Price100" class="form-control" />
+            <span class="text-danger" asp-validation-for="Price100"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="CategoryId"></label>
+            <select class="form-select" asp-for="CategoryId" asp-items="@ViewBag.Category">
+                <option selected disabled>-- Select Category</option>
+            </select>
+            <span class="text-danger" asp-validation-for="CategoryId"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="CoverTypeId"></label>
+            <select class="form-select" asp-for="CoverTypeId" asp-items="@ViewBag.CoverType">
+                <option selected disabled>-- Select Cover Type</option>
+            </select>
+            <span class="text-danger" asp-validation-for="CoverTypeId"></span>
+        </div>
+        <button class="btn btn-outline-success" type="submit" style="width: 150px">Create</button>
+        <a class="btn btn-secondary mx-2" style="width: 150px" asp-action="Index" asp-controller="Product" asp-area="Admin">
+            Back to the list
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+    <partial name="_ValidationScriptsPartial" />
+    }
+}
