@@ -1,6 +1,8 @@
 ﻿using Books.Data;
 using Books.DataAcess.Repository.IRepository;
 using Books.Model;
+using Books.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,7 @@ namespace Books.DataAcess.Repository
         {
             if (obj == null) return;
             var objFromDba = base.GetFirstOrDefault(x => x.Id == obj.Id, isTrack: false);
-            if(objFromDba != null)
+            if (objFromDba != null)
             {
                 objFromDba.Title = obj.Title;
                 objFromDba.Description = obj.Description;
@@ -33,10 +35,9 @@ namespace Books.DataAcess.Repository
                 objFromDba.Price100 = obj.Price100;
                 objFromDba.CategoryId = obj.CategoryId;
                 objFromDba.CoverTypeId = obj.CoverTypeId;
-                if(obj.ImageUrl != null)
-                {
+                if (obj.ImageUrl != null)
                     objFromDba.ImageUrl = obj.ImageUrl;
-                }
+               
                 _db.Update(objFromDba);
             }
 

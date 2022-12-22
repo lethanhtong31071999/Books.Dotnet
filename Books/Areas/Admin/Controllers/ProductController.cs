@@ -11,13 +11,15 @@ namespace Books.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unit;
-        public ProductController(IUnitOfWork unit)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ProductController(IUnitOfWork unit, IWebHostEnvironment webHostEnv)
         {
             _unit = unit;
+            _webHostEnvironment = webHostEnv;
         }
 
         public IActionResult Index()
-        {
+        {           
             return View();
         }
 
@@ -43,13 +45,13 @@ namespace Books.Areas.Admin.Controllers
                          Value = x.Id.ToString(),
                      }
                 );
+            viewModel.CoverTypeSelectList = coverTypes;
+            viewModel.CategorySelectList = categories;
 
             if (id == null || id == 0)
             {
                 // Create Function               
                 viewModel.Product = new Product();
-                viewModel.CoverTypeSelectList = coverTypes;
-                viewModel.CategorySelectList = categories;
             }
             else
             {
@@ -58,8 +60,7 @@ namespace Books.Areas.Admin.Controllers
                 if (obj != null)
                 {
                     viewModel.Product = obj;
-                    viewModel.CoverTypeSelectList = coverTypes;
-                    viewModel.CategorySelectList = categories;
+
                 }
                 else
                     TempData["error"] = "Something went wrong!";
@@ -68,10 +69,16 @@ namespace Books.Areas.Admin.Controllers
             return View(viewModel);
         }
         [HttpPost]
-        public IActionResult Upsert(ProductVM obj, IFormFile file)
+        public IActionResult Upsert(ProductVM obj, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
+                if (file != null)
+                {
+                    // Handle file image
+                    var fileName = CreateImageUrlAndGetFileName(file, obj.Product.ImageUrl);
+                    obj.Product.ImageUrl = @$"\images\products\{fileName}";
+                }
                 if (obj.Product.Id == 0)
                 {
                     // Create
@@ -90,36 +97,107 @@ namespace Books.Areas.Admin.Controllers
             }
             else
             {
-                TempData["error"] = "Something went wrong!";
+                TempData["error"] = "The values in fields are wrong!";
                 return View(obj);
             }
         }
 
         // Delete
-        public IActionResult Delete(int? id)
-        {
-            if (id == null || id == 0) return NotFound();
-            var obj = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == id);
-            return obj != null ? View(obj) : NotFound();
-        }
-        [HttpPost]
+        [HttpDelete]
         public IActionResult Delete(int? id, bool trashParam = true)
         {
-            if (id == null || id == 0)
+            if (id != null && id != 0)
             {
-                TempData["error"] = "It is not a exsisting product!";
-                return View();
+                var objFromDba = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == id, isTrack: true);
+                var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, objFromDba.ImageUrl);
+                if (System.IO.File.Exists(oldPath))
+                {
+                    System.IO.File.Delete(oldPath);
+                }
+                if (objFromDba != null)
+                {
+                    _unit.ProductRepo.Remove(objFromDba);
+                    _unit.Save();
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Deleted successfully!"
+                    });
+                }
             }
-            var objFromDba = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == id, isTrack: true);
-            if (objFromDba != null)
+            return Json(new
             {
-                _unit.ProductRepo.Remove(objFromDba);
-                _unit.Save();
-                TempData["success"] = "Product was deleted successfully!";
-                return RedirectToAction("Index");
+                success = false,
+                message = "Something went wrong!"
+            });
+        }
+
+        // Image file
+        private string CreateImageUrlAndGetFileName(IFormFile file, string oldImgUrl)
+        {
+            // Remove old image path
+            if (oldImgUrl != null)
+            {
+                var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, oldImgUrl);
+                if (System.IO.File.Exists(oldPath))
+                {
+                    System.IO.File.Delete(oldPath);
+                }
             }
-            TempData["error"] = "It failed to delete the product!";
-            return View();
+            // Create a path upload
+            string rootPath = _webHostEnvironment.WebRootPath;
+            string pathUpload = Path.Combine(rootPath, @"images\products");
+            // Create a unique file name
+            string uniqueString = Guid.NewGuid().ToString();
+            string fileName = $"{uniqueString}{file.FileName}";
+            using (var fileStream = new FileStream(Path.Combine(pathUpload, fileName), FileMode.Create))
+            {
+                file.CopyTo(fileStream);
+            }
+            return fileName;
+        }
+
+        #region API endpoint
+
+        [HttpGet]
+        public IActionResult GetAllProducts(string txtSearch, int? page)
+        {
+            var products = _unit.ProductRepo.GetAll(includedProps: "Category,CoverType");
+            return Json(new
+            {
+                data = products,
+                draw = 4,
+                recordsTotal = 57,
+                recordsFiltered = 57,
+            });
+        }
+
+        #endregion
+
+        // Clone Data
+        private void CloneData()
+        {
+            var obj = _unit.ProductRepo.GetFirstOrDefault(x => true);
+            var products = new List<Product>();
+            for (int i = 0; i < 100; i++)
+            {
+                products.Add(new Product()
+                {
+                    Title = obj.Title,
+                    Description = obj.Description,
+                    ISBN = obj.ISBN,
+                    Author = obj.Author,
+                    ListPrice = obj.ListPrice,
+                    Price = obj.Price,
+                    Price50 = obj.Price50,
+                    Price100 = obj.Price100,
+                    CategoryId = obj.CategoryId,
+                    CoverTypeId = obj.CoverTypeId,
+                    ImageUrl = obj.ImageUrl,
+                });
+            }
+            _unit.ProductRepo.AddRange(products.AsEnumerable<Product>());
+            _unit.Save();
         }
     }
 }

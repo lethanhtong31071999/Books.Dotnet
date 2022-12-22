@@ -19,7 +19,6 @@ namespace Books.DataAcess.Repository
             _db = db;
             _dbSet = _db.Set<T>();
         }
-        // SU khac nhau giua IQueryable va DbSet
 
         // Add
         public void Add(T entity)
@@ -33,16 +32,34 @@ namespace Books.DataAcess.Repository
         }
 
         // Get
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(string includedProps = null)
         {
             IQueryable<T> query = _dbSet;
+            // Rule: "property1,property2"
+            if (includedProps != null)
+            {
+                var props = includedProps.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+                props.ForEach(x =>
+                {
+                    query = query.Include(x);
+                });
+            }
             return query;
         }
 
-        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, bool isTrack = true)
+        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, bool isTrack = true, string includedProps = null)
         {
             IQueryable<T> query = _dbSet;
             query = isTrack ? query.Where(filter) : query.Where(filter).AsNoTracking();
+            // Rule: "property1,property2"
+            if(includedProps != null)
+            {
+                var props = includedProps.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+                props.ForEach(x =>
+                {
+                    query = query.Include(x);
+                });
+            }
             return query.FirstOrDefault<T>();
         }
 
