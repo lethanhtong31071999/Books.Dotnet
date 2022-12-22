@@ -1,5 +1,6 @@
 ﻿using Books.DataAcess.Repository;
 using Books.Model;
+using Books.Model.ViewModel;
 using Books.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -24,69 +25,74 @@ namespace Books.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Upsert(int? id)
         {
-            if (id == null || id == 0)
-            {
-                // Create Function
-                IEnumerable<SelectListItem> categories = _unit.CategoryRepo
+            var viewModel = new ProductVM();
+            IEnumerable<SelectListItem> categories = _unit.CategoryRepo
                     .GetAll()
                     .Select(x => new SelectListItem()
                     {
                         Text = x.Name,
                         Value = x.Id.ToString()
                     });
-                IEnumerable<SelectListItem> coverTypes = _unit.CoverTypeRepo
-                    .GetAll()
-                    .Select(x =>
+            IEnumerable<SelectListItem> coverTypes = _unit.CoverTypeRepo
+                .GetAll()
+                .Select(x =>
 
-                         new SelectListItem()
-                         {
-                             Text = x.Name,
-                             Value = x.Id.ToString(),
-                         }
-                    );
-                ViewBag.Category = categories;           
-                ViewBag.CoverType = coverTypes;
+                     new SelectListItem()
+                     {
+                         Text = x.Name,
+                         Value = x.Id.ToString(),
+                     }
+                );
 
-                return View(new Product());
+            if (id == null || id == 0)
+            {
+                // Create Function               
+                viewModel.Product = new Product();
+                viewModel.CoverTypeSelectList = coverTypes;
+                viewModel.CategorySelectList = categories;
             }
             else
             {
                 // Update Function
                 var obj = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == id, isTrack: false);
-                return View(obj);
+                if (obj != null)
+                {
+                    viewModel.Product = obj;
+                    viewModel.CoverTypeSelectList = coverTypes;
+                    viewModel.CategorySelectList = categories;
+                }
+                else
+                    TempData["error"] = "Something went wrong!";
             }
+
+            return View(viewModel);
         }
         [HttpPost]
-        public IActionResult Upsert(Product obj)
+        public IActionResult Upsert(ProductVM obj, IFormFile file)
         {
-            if (obj.Id == 0)
+            if (ModelState.IsValid)
             {
-                // Create Function
-                if (ModelState.IsValid)
+                if (obj.Product.Id == 0)
                 {
-                    _unit.ProductRepo.Add(obj);
+                    // Create
+                    _unit.ProductRepo.Add(obj.Product);
                     _unit.Save();
                     TempData["success"] = "Product was created successfully!";
                 }
                 else
-                    TempData["error"] = "It failed to create the product!";
-            }
-            else
-            {
-                // Update Function
-                if (!ModelState.IsValid)
                 {
-                    _unit.ProductRepo.Update(obj);
+                    // Update
+                    _unit.ProductRepo.Update(obj.Product);
                     _unit.Save();
                     TempData["success"] = "Product was updated successfully!";
                 }
-                else
-                {
-                    TempData["error"] = "Something went wrong!";
-                    return View(obj);
-                }
+                return RedirectToAction("Index");
             }
-            return RedirectToAction("Index");
+            else
+            {
+                TempData["error"] = "Something went wrong!";
+                return View(obj);
+            }
         }
 
         // Delete

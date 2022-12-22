@@ -53,15 +53,15 @@ namespace Books.Model
         [Required]
         [Display(Name = "Category")]
         public int CategoryId { get;set; }
-        [ValidateNever]
         [ForeignKey("CategoryId")]
+        [ValidateNever]
         public Category Category { get; set; }
 
         [Required]
         [Display(Name = "Cover Type")]
         public int CoverTypeId { get; set; }
-        [ValidateNever]
         [ForeignKey("CoverTypeId")]
+        [ValidateNever]
         public CoverType CoverType { get; set; }
     }
 }
