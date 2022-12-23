@@ -1,5 +1,6 @@
 ﻿using Books.Data;
 using Books.DataAcess.Repository.IRepository;
+using Books.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,20 @@ namespace Books.DataAcess.Repository
             _dbSet = _db.Set<T>();
         }
 
+        public IQueryable<T> IncludeProperty(IQueryable<T> query, string? includedProps)
+        {
+            // Rule: "property1,property2"
+            if (includedProps != null)
+            {
+                var props = includedProps.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+                props.ForEach(x =>
+                {
+                    query = query.Include(x);
+                });
+            }
+            return query;
+        }
+
         // Add
         public void Add(T entity)
         {
@@ -35,16 +50,7 @@ namespace Books.DataAcess.Repository
         public IEnumerable<T> GetAll(string includedProps = null)
         {
             IQueryable<T> query = _dbSet;
-            // Rule: "property1,property2"
-            if (includedProps != null)
-            {
-                var props = includedProps.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
-                props.ForEach(x =>
-                {
-                    query = query.Include(x);
-                });
-            }
-            return query;
+            return IncludeProperty(query, includedProps);
         }
 
         public T GetFirstOrDefault(Expression<Func<T, bool>> filter, bool isTrack = true, string includedProps = null)
@@ -52,7 +58,7 @@ namespace Books.DataAcess.Repository
             IQueryable<T> query = _dbSet;
             query = isTrack ? query.Where(filter) : query.Where(filter).AsNoTracking();
             // Rule: "property1,property2"
-            if(includedProps != null)
+            if (includedProps != null)
             {
                 var props = includedProps.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
                 props.ForEach(x =>

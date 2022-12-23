@@ -36,11 +36,33 @@ namespace Books.DataAcess.Repository
                 objFromDba.CategoryId = obj.CategoryId;
                 objFromDba.CoverTypeId = obj.CoverTypeId;
                 if (obj.ImageUrl != null)
-                    objFromDba.ImageUrl = obj.ImageUrl;
-               
+                    objFromDba.ImageUrl = obj.ImageUrl;               
                 _db.Update(objFromDba);
             }
 
+        }
+
+        public Pagination<Product> GetAllWithPagination(Pagination<Product> pagingModel, string includedProps = null)
+        {
+            IQueryable<Product> query = _db.Products;
+            pagingModel.RecordsTotal = query.Count();
+            var textSearch = pagingModel.Filter.TextSearch;
+            if (textSearch.Trim().Length > 0)
+            {              
+                query = query
+                    .Where(x => x.Author.Contains(textSearch) || x.Title.Contains(textSearch) || x.ISBN.Contains(textSearch))
+                    .Skip(pagingModel.Filter.Start).Take(pagingModel.Filter.Length);
+                pagingModel.Filter.Start = 0;
+                pagingModel.RecordsFiltered = query.Count();
+                pagingModel.RecordsTotal = query.Count();
+            }
+            else
+            {
+                query = query.Skip(pagingModel.Filter.Start).Take(pagingModel.Filter.Length);
+            }
+            query = base.IncludeProperty(query, includedProps);
+            pagingModel.Data = query;
+            return pagingModel;
         }
     }
 }

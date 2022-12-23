@@ -1,5 +1,6 @@
 ﻿using Books.DataAcess.Repository;
 using Books.Model;
+using Books.Model.PaginationModel;
 using Books.Model.ViewModel;
 using Books.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,9 @@ namespace Books.Areas.Admin.Controllers
         }
 
         public IActionResult Index()
-        {           
+        {
+            //DeleteData();
+            //CloneData();
             return View();
         }
 
@@ -158,20 +161,34 @@ namespace Books.Areas.Admin.Controllers
         }
 
         #region API endpoint
+        [HttpPost]
+        public IActionResult GetAllProducts()
+       {
+            var paginationModel = new Pagination<Product>() { 
+                Filter = new Filter()
+                {
+                    Length = Convert.ToInt32(Request.Form["length"].FirstOrDefault()),
+                    Start = Convert.ToInt32(Request.Form["start"].FirstOrDefault()),
+                    // check text search null/""
+                    TextSearch = Request.Form["search[value]"].FirstOrDefault()
+                },
+                Draw = Convert.ToInt32(Request.Form["draw"].FirstOrDefault()),
+                RecordsFiltered = 0,
+                RecordsTotal = 0,
+                Data = null,
+            };
 
-        [HttpGet]
-        public IActionResult GetAllProducts(string txtSearch, int? page)
-        {
-            var products = _unit.ProductRepo.GetAll(includedProps: "Category,CoverType");
+            paginationModel = _unit.ProductRepo
+                .GetAllWithPagination(paginationModel, includedProps: "Category,CoverType");
+            //return Json(productPagination);
             return Json(new
             {
-                data = products,
-                draw = 4,
-                recordsTotal = 57,
-                recordsFiltered = 57,
+                data = paginationModel.Data,
+                recordsFiltered = paginationModel.RecordsTotal,
+                recordsTotal = paginationModel.RecordsTotal,
+                draw = paginationModel.Draw,
             });
         }
-
         #endregion
 
         // Clone Data
@@ -183,10 +200,10 @@ namespace Books.Areas.Admin.Controllers
             {
                 products.Add(new Product()
                 {
-                    Title = obj.Title,
+                    Title = obj.Title+" "+i,
                     Description = obj.Description,
                     ISBN = obj.ISBN,
-                    Author = obj.Author,
+                    Author = obj.Author + " " + i,
                     ListPrice = obj.ListPrice,
                     Price = obj.Price,
                     Price50 = obj.Price50,
@@ -197,6 +214,11 @@ namespace Books.Areas.Admin.Controllers
                 });
             }
             _unit.ProductRepo.AddRange(products.AsEnumerable<Product>());
+            _unit.Save();
+        }
+        private void DeleteData()
+        {            
+            _unit.ProductRepo.RemoveRange(_unit.ProductRepo.GetAll());
             _unit.Save();
         }
     }

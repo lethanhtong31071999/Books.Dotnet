@@ -1,15 +1,20 @@
-﻿$(document).ready(function () {
+﻿
+$(document).ready(function () {
     loadProductTable();
 });
 
 function loadProductTable() {
     $('#productTable').DataTable({
+        processing: true,
+        serverSide: true,
+        filter: true,
+        pagingType: "simple_numbers",
         "ajax": {
             url: "/Admin/Product/GetAllProducts",
+            type: "POST",
         },
         scrollY: '500px',
         scrollCollapse: true,
-        pagingType: "simple_numbers",
         "columns": [
             { "data": "title", "width": "15%" },
             { "data": "isbn", "width": "15%" },
