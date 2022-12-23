@@ -4,6 +4,7 @@ using Books.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Books.DataAcess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221221043649_AddProductToDba")]
+    partial class AddProductToDba
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,8 +92,6 @@ namespace Books.DataAcess.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CoverTypeId");
-
                     b.ToTable("Products");
                 });
 
@@ -120,15 +120,15 @@ namespace Books.DataAcess.Migrations
 
             modelBuilder.Entity("Books.Model.Product", b =>
                 {
-                    b.HasOne("Books.Models.Category", "Category")
+                    b.HasOne("Books.Model.CoverType", "CoverType")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Books.Model.CoverType", "CoverType")
+                    b.HasOne("Books.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CoverTypeId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

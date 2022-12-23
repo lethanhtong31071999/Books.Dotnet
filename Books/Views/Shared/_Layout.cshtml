@@ -10,12 +10,14 @@
     <link rel="stylesheet" href="~/Books.styles.css" asp-append-version="true" />
     @*Toastr*@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    @*DataTable*@
+    <link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" />
 </head>
 <body>
-    <header>
+    <header class="position-sticky top-0" style="z-index:100">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-action="Index" asp-controller="Home">Navbar</a>
+                <a class="navbar-brand" asp-area="Customer" asp-action="Index" asp-controller="Home">Navbar</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -29,7 +31,9 @@
                             </li>*@
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                Management
+                            </a>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">
                                     Category
@@ -37,6 +41,10 @@
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" asp-area="Admin" asp-controller="CoverType" asp-action="Index">
                                     Cover Type
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Product" asp-action="Index">
+                                    Product
                                 </a>
                             </div>
                         </li>
@@ -57,14 +65,16 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted bg-dark">
+    @*<footer class="border-top footer text-muted bg-dark" style="bottom:unset">
         <div class="container">
             &copy; 2022 - Books - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
+    </footer>*@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
