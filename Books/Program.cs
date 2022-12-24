@@ -1,6 +1,8 @@
+using Books.BusinessLogic.IService;
 using Books.Data;
 using Books.DataAcess.Repository;
 using Books.DataAcess.Repository.IRepository;
+using Books.Service;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
     builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
+builder.Services.AddScoped<IBusinessLogic, BusinessLogic>();
 //builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
