@@ -10,6 +10,6 @@ namespace Books.BusinessLogic.IBusinessLogic
         public bool HandleDeleteProduct(int id);
         public void CreateDataBasedOn1Data();
         public void DeleteData();
-        public Pagination<Product> HandleGetAllProductsPagination(Pagination<Product> paginationModel);
+        public Pagination<Product> HandleGetAllProductsWithPagination(Pagination<Product> paginationModel);
     }
 }

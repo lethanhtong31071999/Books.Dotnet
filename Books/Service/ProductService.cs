@@ -57,7 +57,6 @@ namespace Books.BusinessLogic
             }
             return viewModel;
         }
-
         public bool HandleUpsertPostMethod(ProductVM obj, IFormFile? file)
         {
             try
@@ -87,7 +86,6 @@ namespace Books.BusinessLogic
                 return false;
             }
         }
-
         public bool HandleDeleteProduct(int id)
         {
             try
@@ -111,7 +109,7 @@ namespace Books.BusinessLogic
                 return false;
             }
         }
-        public Pagination<Product> HandleGetAllProductsPagination(Pagination<Product> paginationModel)
+        public Pagination<Product> HandleGetAllProductsWithPagination(Pagination<Product> paginationModel)
         {
             return _unit.ProductRepo
                 .GetAllWithPagination(paginationModel, includedProps: "Category,CoverType");
@@ -141,7 +139,7 @@ namespace Books.BusinessLogic
             return fileName;
         }
 
-        // Clone Data
+        // Clone and Delete Products
         public void CreateDataBasedOn1Data()
         {
             var obj = _unit.ProductRepo.GetFirstOrDefault(x => true);

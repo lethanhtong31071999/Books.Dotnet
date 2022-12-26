@@ -47,7 +47,7 @@ namespace Books.DataAcess.Repository
             IQueryable<Product> query = _db.Products;
             pagingModel.RecordsTotal = query.Count();
             var textSearch = pagingModel.Filter.TextSearch;
-            if (textSearch.Trim().Length > 0)
+            if (textSearch != null && textSearch.Trim().Length > 0)
             {              
                 query = query
                     .Where(x => x.Author.Contains(textSearch) || x.Title.Contains(textSearch) || x.ISBN.Contains(textSearch))

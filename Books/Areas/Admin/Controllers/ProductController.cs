@@ -107,7 +107,7 @@ namespace Books.Areas.Admin.Controllers
                 RecordsTotal = 0,
                 Data = null,
             };
-            paginationModel = _businessLogic.ProductService.HandleGetAllProductsPagination(paginationModel);
+            paginationModel = _businessLogic.ProductService.HandleGetAllProductsWithPagination(paginationModel);
             return Json(new
             {
                 data = paginationModel.Data,
