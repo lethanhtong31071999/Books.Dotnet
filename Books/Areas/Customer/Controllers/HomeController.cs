@@ -1,22 +1,37 @@
-﻿using Books.Models;
+﻿using Books.BusinessLogic.IService;
+using Books.DataAcess.Repository;
+using Books.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using X.PagedList;
 
 namespace Books.Controllers
 {
     [Area("Customer")]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IBusinessLogic _businessLogic;
+        private readonly IUnitOfWork _unit;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IBusinessLogic businessLogic, IUnitOfWork unit)
         {
-            _logger = logger;
+            _businessLogic = businessLogic;
+            _unit = unit;   
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int? page, string searchTxt)
         {
-            return View();
+            var products = _unit.ProductRepo.GetAll();
+            int pageSize = 8;
+            int pageNumber = (page ?? 1);
+            if (!String.IsNullOrEmpty(searchTxt))
+            {
+                products = products.Where(x => x.Title.ToLower().Contains(searchTxt.ToLower()));
+                page = 1;
+                ViewBag.CurrentSearch = searchTxt;
+            }
+            
+            return View(products.ToPagedList(pageNumber, pageSize));
         }
 
         public IActionResult Privacy()
