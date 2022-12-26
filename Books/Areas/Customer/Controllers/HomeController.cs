@@ -1,6 +1,5 @@
 ﻿using Books.BusinessLogic.IService;
 using Books.DataAcess.Repository;
-using Books.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using X.PagedList;
