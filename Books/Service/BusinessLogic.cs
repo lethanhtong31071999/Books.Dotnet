@@ -3,7 +3,6 @@ using Books.BusinessLogic.IBusinessLogic;
 using Books.BusinessLogic.IService;
 using Books.Data;
 using Books.DataAcess.Repository;
-using Books.Service.IService;
 
 namespace Books.Service
 {
@@ -12,13 +11,11 @@ namespace Books.Service
         private readonly IUnitOfWork _unit;
         private readonly IWebHostEnvironment _webHostEnvironment;
         public IProductService ProductService { get;}
-        public ICompanyService CompanyService { get; }
         public BusinessLogic(IUnitOfWork unit, IWebHostEnvironment webHostEnv)
         {
             _unit = unit;
             _webHostEnvironment = webHostEnv;
             ProductService = new ProductService(_unit, _webHostEnvironment);
-            CompanyService = new CompanyService(_unit, _webHostEnvironment);
         }
     }
 }
