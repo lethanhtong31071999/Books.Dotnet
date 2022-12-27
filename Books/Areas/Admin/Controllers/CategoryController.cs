@@ -1,9 +1,6 @@
-﻿using Books.Data;
-using Books.DataAcess.Repository;
-using Books.DataAcess.Repository.IRepository;
+﻿using Books.DataAcess.Repository;
 using Books.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Books.Controllers
 {
