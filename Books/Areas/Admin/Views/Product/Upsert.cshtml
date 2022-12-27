@@ -72,7 +72,7 @@
                 <div>
                     <button class="btn btn-outline-success"
                             type="submit" style="width: 150px"
-                            onclick="return ValidateInput(@Model.Product.Id)" >
+                            onclick="return ValidateInput(@Model.Product.Id)">
                         @(Model.Product.Id == 0 ? "Create" : "Update")
                     </button>
                     <a class="btn btn-secondary mx-2" style="width: 150px" asp-action="Index" asp-controller="Product" asp-area="Admin">
@@ -92,6 +92,12 @@
     <partial name="_ValidationScriptsPartial" />
     }
 <script>
+    tinymce.init({
+      selector: 'textarea',
+      plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+      toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+    });
+
     function ValidateInput(idProduct) {
         if(document.querySelector("#uploadBox").value == "" && idProduct == 0) {
             Swal.fire({

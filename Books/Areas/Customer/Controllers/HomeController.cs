@@ -1,7 +1,7 @@
 ﻿using Books.BusinessLogic.IService;
 using Books.DataAcess.Repository;
+using Books.Model;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using X.PagedList;
 
 namespace Books.Controllers
@@ -15,7 +15,7 @@ namespace Books.Controllers
         public HomeController(IBusinessLogic businessLogic, IUnitOfWork unit)
         {
             _businessLogic = businessLogic;
-            _unit = unit;   
+            _unit = unit;
         }
 
         public IActionResult Index(int? page, string searchTxt)
@@ -29,19 +29,27 @@ namespace Books.Controllers
                 page = 1;
                 ViewBag.CurrentSearch = searchTxt;
             }
-            
+
             return View(products.ToPagedList(pageNumber, pageSize));
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        public IActionResult Details(int? id)
+            {
+            if (id != null || id != 0)
+            {
+                var product = _unit.ProductRepo
+                    .GetFirstOrDefault(x => x.Id == id, isTrack: false, includedProps: "Category,CoverType");
+                if (product != null)
+                {
+                    return View(new ShoppingCart ()
+                    {
+                        Count = 1,
+                        Product = product,
+                    });
+                }
+            }
+            TempData["error"] = "Something went wrong!";
+            return RedirectToAction("Index", "Home");
         }
     }
 }
