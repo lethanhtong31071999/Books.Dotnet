@@ -14,12 +14,14 @@ namespace Books.DataAcess.Repository
         public ICategoryRepo CategoryRepo { get; private set; }
         public ICoverTypeRepo CoverTypeRepo { get; private set; }
         public IProductRepo ProductRepo { get; private set; }   
+        public ICompanyRepo CompanyRepo { get; private set; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
             CategoryRepo = new CategoryRepo(_db);
             CoverTypeRepo = new CoverTypeRepo(_db);
             ProductRepo = new ProductRepo(_db);
+            CompanyRepo = new CompanyRepo(_db);
         }
 
         public void Save()
