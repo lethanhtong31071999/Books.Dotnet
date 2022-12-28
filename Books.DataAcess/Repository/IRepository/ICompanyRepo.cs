@@ -10,5 +10,6 @@ namespace Books.DataAcess.Repository.IRepository
     public interface ICompanyRepo : IRepository<Company>
     {
         public void Update(Company obj);
+        public Pagination<Company> GetAllWithPagination(Pagination<Company> pagingModel, string includedProps = null);
     }
 }

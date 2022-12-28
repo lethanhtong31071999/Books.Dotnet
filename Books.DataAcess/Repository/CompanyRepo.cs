@@ -17,7 +17,30 @@ namespace Books.DataAcess.Repository
         {
             _db = db;
         }
-        
+
+        public Pagination<Company> GetAllWithPagination(Pagination<Company> pagingModel, string includedProps = null)
+        {
+            IQueryable<Company> query = _db.Company;
+            pagingModel.RecordsTotal = query.Count();
+            var textSearch = pagingModel.Filter.TextSearch;
+            if (textSearch != null && textSearch.Trim().Length > 0)
+            {
+                query = query
+                    .Where(x => x.Name.Contains(textSearch))
+                    .Skip(pagingModel.Filter.Start).Take(pagingModel.Filter.Length);
+                pagingModel.Filter.Start = 0;
+                pagingModel.RecordsFiltered = query.Count();
+                pagingModel.RecordsTotal = query.Count();
+            }
+            else
+            {
+                query = query.Skip(pagingModel.Filter.Start).Take(pagingModel.Filter.Length);
+            }
+            query = base.IncludeProperty(query, includedProps);
+            pagingModel.Data = query;
+            return pagingModel;
+        }
+
         public void Update(Company obj)
         {
             if (obj == null) return;
