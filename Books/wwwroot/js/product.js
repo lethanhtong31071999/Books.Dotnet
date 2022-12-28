@@ -4,7 +4,7 @@ $(document).ready(function () {
 });
 
 function loadProductTable() {
-    $('#productTable').DataTable({
+    $('#dataTableAdmin').DataTable({
         processing: true,
         serverSide: true,
         filter: true,
@@ -31,7 +31,7 @@ function loadProductTable() {
                             <i class="bi bi-pencil-square"></i>
                             Update
                         </a>
-                        <a class="btn btn-warning mx-1" onclick="deleteProduct('/Admin/Product/Delete/${id}')" >
+                        <a class="btn btn-warning mx-1" onclick="deleteItemInAdmin('/Admin/Product/Delete/${id}')" >
                             <i class="bi bi-trash-fill"></i>
                             Delete
                         </a>
@@ -41,33 +41,4 @@ function loadProductTable() {
             }
         ]
     });
-}
-
-function deleteProduct(url) {
-    if (url != "") {
-        new swal({
-            title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this imaginary file!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, delete it!"
-        })
-            .then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: url,
-                        type: "Delete",
-                        success: function (data) {
-                            if (data) {
-                                $('#productTable').DataTable().ajax.reload();
-                                new swal(data.message, {
-                                    icon: "success",
-                                });
-                            } else {
-                            }
-                        }
-                    });            
-                }
-        });
-    }
 }
