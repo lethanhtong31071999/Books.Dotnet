@@ -3,6 +3,7 @@
 #nullable disable
 
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using Books.DataAcess.Repository;
@@ -133,19 +134,18 @@ namespace BookTemp.Areas.Identity.Pages.Account
                 user.City = Input.City;
                 user.State = Input.State;
                 user.PostalCode = Input.PostalCode;
-                if(Input.Role == SD.Role_User_Company) 
+                if (Input.Role == SD.Role_User_Company)
                     user.CompanyId = Input.CompanyId;
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     // Add Role for User in UserRole Table
-                    if(String.IsNullOrEmpty(Input.Role))
-                       await  _userManager.AddToRoleAsync(user, SD.Role_User_Individual);
+                    _logger.LogInformation("User created a new accoun¶t with password.");
+                    if (String.IsNullOrEmpty(Input.Role))
+                        await _userManager.AddToRoleAsync(user, SD.Role_User_Individual);
                     else
                         await _userManager.AddToRoleAsync(user, Input.Role);
-
-                    _logger.LogInformation("User created a new accoun¶t with password.");
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -164,15 +164,8 @@ namespace BookTemp.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        if (User.IsInRole(SD.Role_Admin))
-                        {
-                            TempData["success"] = "New User Created Successfully";
-                        }
-                        else
-                        {
-                            await _signInManager.SignInAsync(user, isPersistent: false);
-
-                        }
+                        TempData["success"] = "New User Created Successfully";
+                        await _signInManager.SignInAsync(user, isPersistent: true);
                         return LocalRedirect(returnUrl);
                     }
                 }
