@@ -1,9 +1,12 @@
 using Books.BusinessLogic.IService;
 using Books.Data;
 using Books.DataAcess.Repository;
+using Books.Model;
 using Books.Service;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Model.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +15,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
     ));
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders()
     .AddEntityFrameworkStores<ApplicationDbContext>();
-
 builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 builder.Services.AddScoped<IBusinessLogic, BusinessLogic>();
+builder.Services.AddSingleton<IEmailSender, EmailSender>();
+builder.Services.AddMvc();
 //builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
