@@ -1,0 +1,59 @@
+﻿@model Company
+
+<div class="mt-4">
+    <form method="post" enctype="multipart/form-data" asp-area="Admin" asp-action="Upsert" asp-controller="Company">
+        <input asp-for="Id" hidden readonly />
+        <div class="border p-3 row">
+            <div class="row pb-2">
+                <h2 class="text-primary text-center">@(Model.Id == 0 ? "Create": "Update") Company</h2>
+                <hr />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span class="text-danger" asp-validation-for="Name"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="StreetAddress"></label>
+                <input asp-for="StreetAddress" class="form-control" />
+                <span class="text-danger" asp-validation-for="StreetAddress"></span>
+            </div>
+            <div class="mb-3 col-6">
+                <label asp-for="City"></label>
+                <input asp-for="City" class="form-control" />
+                <span class="text-danger" asp-validation-for="City"></span>
+            </div>
+            <div class="mb-3 col-6">
+                <label asp-for="State"></label>
+                <input asp-for="State" class="form-control" />
+                <span class="text-danger" asp-validation-for="State"></span>
+            </div>
+            <div class="mb-3 col-6">
+                <label asp-for="PostalCode"></label>
+                <input asp-for="PostalCode" class="form-control" />
+                <span class="text-danger" asp-validation-for="PostalCode"></span>
+            </div>
+            <div class="mb-3 col-6">
+                <label asp-for="PhoneNumber"></label>
+                <input type="number" asp-for="PhoneNumber" class="form-control" />
+                <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+            </div>
+            <div>
+                <button class="btn btn-outline-success"
+                        type="submit" style="width: 150px"
+                        onclick="return ValidateInput(@Model.Id)">
+                    @(Model.Id == 0 ? "Create" : "Update")
+                </button>
+                <a class="btn btn-secondary mx-2" style="width: 150px" asp-action="Index" asp-controller="Company" asp-area="Admin">
+                    Back to the list
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+    <partial name="_ValidationScriptsPartial" />
+    }
+}

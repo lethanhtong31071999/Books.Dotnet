@@ -75,12 +75,6 @@ namespace Books.Areas.Admin.Controllers
                         success = true,
                         message = "Deleted successfully!"
                     });
-                else
-                    return Json(new
-                    {
-                        success = true,
-                        message = "Deleted successfully!"
-                    });
             }
             return Json(new
             {

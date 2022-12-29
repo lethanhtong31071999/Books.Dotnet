@@ -12,6 +12,7 @@ namespace Books.DataAcess.Repository
         public ICategoryRepo CategoryRepo { get; }
         public ICoverTypeRepo CoverTypeRepo { get; }
         public IProductRepo ProductRepo { get; }
+        public ICompanyRepo CompanyRepo { get; }
         public void Save();
     }
 }
