@@ -8,5 +8,7 @@ namespace Books.BusinessLogic.IService
     {
         public IProductService ProductService { get; }
         public ICompanyService CompanyService { get; } 
+        public IUserService UserService { get; }
+        public IShoppingCartService ShoppingCartService { get; }
     }
 }

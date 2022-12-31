@@ -13,6 +13,8 @@ namespace Books.DataAcess.Repository
         public ICoverTypeRepo CoverTypeRepo { get; }
         public IProductRepo ProductRepo { get; }
         public ICompanyRepo CompanyRepo { get; }
+        public IUserRepo UserRepo { get; }
+        public IShoppingCartRepo ShoppingCartRepo { get; }
         public void Save();
     }
 }

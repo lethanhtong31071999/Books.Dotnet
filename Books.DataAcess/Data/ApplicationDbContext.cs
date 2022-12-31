@@ -16,5 +16,6 @@ namespace Books.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Company> Company {get; set;}
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     }
 }

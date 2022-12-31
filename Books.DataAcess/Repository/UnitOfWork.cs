@@ -15,6 +15,8 @@ namespace Books.DataAcess.Repository
         public ICoverTypeRepo CoverTypeRepo { get; private set; }
         public IProductRepo ProductRepo { get; private set; }   
         public ICompanyRepo CompanyRepo { get; private set; }
+        public IUserRepo UserRepo { get; private set; }
+        public IShoppingCartRepo ShoppingCartRepo { get; private set; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -22,6 +24,8 @@ namespace Books.DataAcess.Repository
             CoverTypeRepo = new CoverTypeRepo(_db);
             ProductRepo = new ProductRepo(_db);
             CompanyRepo = new CompanyRepo(_db);
+            ShoppingCartRepo = new ShoppingCartRepo(_db);
+            UserRepo = new UserRepo(_db);
         }
 
         public void Save()
