@@ -12,5 +12,8 @@ namespace Model.Utility
         public const string Role_User_Company = "Company";
         public const string Role_Admin = "Admin";
         public const string Role_Employee = "Employee";
+
+        public const int MaximumDisplayPage = 5;
+        public const int MaximumDisplayProduct = 8;
     }
 }
