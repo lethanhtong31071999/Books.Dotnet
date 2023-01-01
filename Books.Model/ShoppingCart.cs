@@ -26,5 +26,9 @@ namespace Books.Model
         [ValidateNever]
         public User User { get; set; }
 
+        [ValidateNever]
+        [NotMapped]
+        public double FinalPrice { get; set; }
+
     }
 }

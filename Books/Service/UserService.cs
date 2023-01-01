@@ -8,7 +8,7 @@ namespace Books.Service
         private readonly IUnitOfWork _unit;
         public UserService(IUnitOfWork unit)
         {
-            _unit = unit
+            _unit = unit;
         }
     }
 }

@@ -53,20 +53,17 @@ namespace Books.DataAcess.Repository
             return IncludeProperty(query, includedProps);
         }
 
+        public IEnumerable<T> GetAllWithCondition(Expression<Func<T, bool>> filter, string includedProps = null)
+        {
+            IQueryable<T> query = _dbSet.Where<T>(filter);
+            return IncludeProperty(query, includedProps);
+        }
+
         public T GetFirstOrDefault(Expression<Func<T, bool>> filter, bool isTrack = true, string includedProps = null)
         {
             IQueryable<T> query = _dbSet;
             query = isTrack ? query.Where(filter) : query.Where(filter).AsNoTracking();
-            // Rule: "property1,property2"
-            if (includedProps != null)
-            {
-                var props = includedProps.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
-                props.ForEach(x =>
-                {
-                    query = query.Include(x);
-                });
-            }
-            return query.FirstOrDefault<T>();
+            return IncludeProperty(query, includedProps).FirstOrDefault<T>();
         }
 
         public void Remove(T entity)

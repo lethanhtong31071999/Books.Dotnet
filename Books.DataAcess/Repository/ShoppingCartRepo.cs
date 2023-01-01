@@ -16,5 +16,17 @@ namespace Books.DataAcess.Repository
         {
             _db = db;
         }
+
+        public int IncrementCount(ShoppingCart objFromDba, int count)
+        {
+            objFromDba.Count += count;
+            return objFromDba.Count;
+        }
+
+        public int DecrementCount(ShoppingCart objFromDba, int count)
+        {
+            objFromDba.Count -= count;
+            return objFromDba.Count;
+        }
     }
 }
