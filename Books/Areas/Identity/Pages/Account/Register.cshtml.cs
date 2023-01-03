@@ -78,6 +78,9 @@ namespace BookTemp.Areas.Identity.Pages.Account
             // Custom Property Application User
             [Required]
             public string Name { get; set; }
+            [Required]
+            [Display(Name="Phone Number")]
+            public string PhoneNumber { get; set; }
             public string? StreetAddress { get; set; }
             public string? City { get; set; }
             public string? State { get; set; }
@@ -134,6 +137,7 @@ namespace BookTemp.Areas.Identity.Pages.Account
                 user.City = Input.City;
                 user.State = Input.State;
                 user.PostalCode = Input.PostalCode;
+                user.PhoneNumber = Input.PhoneNumber;
                 if (Input.Role == SD.Role_User_Company)
                     user.CompanyId = Input.CompanyId;
                 var result = await _userManager.CreateAsync(user, Input.Password);

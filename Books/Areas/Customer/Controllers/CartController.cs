@@ -29,11 +29,12 @@ namespace Books.Areas.Customer.Controllers
                 ShoppingCarts = _unit.ShoppingCartRepo
                 .GetAllWithCondition(x => x.UserId == claims.Value, includedProps: "Product")
                 .AsEnumerable<ShoppingCart>(),
+                OrderHeader = new OrderHeader(),
             };
             foreach (var cart in _shoppingCartVM.ShoppingCarts)
             {
                 cart.FinalPrice = GetPriceBasedOnQuantity(cart.Count, cart.Product);
-                _shoppingCartVM.TotalPrice += cart.FinalPrice * cart.Count;
+                _shoppingCartVM.OrderHeader.OrderTotal += cart.FinalPrice * cart.Count;
                 _shoppingCartVM.TotalItems += cart.Count;
             }
 
@@ -82,21 +83,32 @@ namespace Books.Areas.Customer.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
         public IActionResult Summary()
         {
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claims = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var applicationUser = _unit.UserRepo.GetFirstOrDefault(x => x.Id == claims.Value);
             _shoppingCartVM = new ShoppingCartVM()
             {
                 ShoppingCarts = _unit.ShoppingCartRepo
-                    .GetAllWithCondition(x => x.UserId == claims.Value, includedProps: "Product")
+                    .GetAllWithCondition(x => x.UserId == applicationUser.Id, includedProps: "Product")
                     .AsEnumerable<ShoppingCart>(),
+                OrderHeader = new OrderHeader()
+                {
+                    Name = applicationUser.Name,
+                    PhoneNumber = applicationUser.PhoneNumber,
+                    StreetAddress = applicationUser.StreetAddress,
+                    City = applicationUser.City,
+                    State = applicationUser.State,
+                    PostalCode = applicationUser.PostalCode,
+                },
             };
             foreach (var cart in _shoppingCartVM.ShoppingCarts)
             {
                 cart.FinalPrice = GetPriceBasedOnQuantity(cart.Count, cart.Product);
-                _shoppingCartVM.TotalPrice += cart.FinalPrice * cart.Count;
                 _shoppingCartVM.TotalItems += cart.Count;
+                _shoppingCartVM.OrderHeader.OrderTotal += cart.FinalPrice * cart.Count;
             }
             return View(_shoppingCartVM);
         }
