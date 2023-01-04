@@ -117,17 +117,17 @@ namespace Books.BusinessLogic
 
         private string CreateImageUrlAndGetFileName(IFormFile file, string oldImgUrl)
         {
+            string rootPath = _webHostEnvironment.WebRootPath;
             // Remove old image path
             if (oldImgUrl != null)
             {
-                var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, oldImgUrl);
+                var oldPath = Path.Combine(rootPath, oldImgUrl.Substring(1));
                 if (System.IO.File.Exists(oldPath))
                 {
                     System.IO.File.Delete(oldPath);
                 }
             }
             // Create a path upload
-            string rootPath = _webHostEnvironment.WebRootPath;
             string pathUpload = Path.Combine(rootPath, @"images\products");
             // Create a unique file name
             string uniqueString = Guid.NewGuid().ToString();

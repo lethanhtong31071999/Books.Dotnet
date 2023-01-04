@@ -15,6 +15,8 @@ namespace Books.DataAcess.Repository
         public ICompanyRepo CompanyRepo { get; }
         public IUserRepo UserRepo { get; }
         public IShoppingCartRepo ShoppingCartRepo { get; }
+        public IOrderDetailRepo OrderDetailRepo { get; }
+        public IOrderHeaderRepo OrderHeaderRepo { get; }
         public void Save();
     }
 }

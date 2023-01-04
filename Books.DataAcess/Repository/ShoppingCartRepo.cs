@@ -28,5 +28,15 @@ namespace Books.DataAcess.Repository
             objFromDba.Count -= count;
             return objFromDba.Count;
         }
+
+        public void Update(ShoppingCart obj)
+        {
+            if (obj == null) return;
+            var objFromDba = base.GetFirstOrDefault(x => x.Id == obj.Id, isTrack: false);
+            if(objFromDba != null)
+            {
+                objFromDba = obj;
+            }
+        }
     }
 }

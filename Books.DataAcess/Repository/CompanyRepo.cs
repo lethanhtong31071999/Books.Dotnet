@@ -20,7 +20,7 @@ namespace Books.DataAcess.Repository
 
         public Pagination<Company> GetAllWithPagination(Pagination<Company> pagingModel, string includedProps = null)
         {
-            IQueryable<Company> query = _db.Company;
+            IQueryable<Company> query = _db.Companies;
             pagingModel.RecordsTotal = query.Count();
             var textSearch = pagingModel.Filter.TextSearch;
             if (textSearch != null && textSearch.Trim().Length > 0)
@@ -53,7 +53,7 @@ namespace Books.DataAcess.Repository
                 objFromDba.State = obj.State;
                 objFromDba.PhoneNumber = obj.PhoneNumber;
                 objFromDba.PostalCode = obj.PostalCode;
-                _db.Company.Update(objFromDba);
+                _db.Companies.Update(objFromDba);
             }
         }
     }

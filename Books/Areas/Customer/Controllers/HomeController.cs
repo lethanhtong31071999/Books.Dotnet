@@ -68,7 +68,10 @@ namespace Books.Controllers
                 var claim = clamsIdentity.FindFirst(ClaimTypes.NameIdentifier);
                 obj.UserId = claim.Value;
                 if(_businessLogic.ShoppingCartService.UpsertShoppingCart(obj))
-                    TempData["success"] = "Added product to cart successfully!";
+                {
+                    var product = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == obj.ProductId);
+                    TempData["success"] = $"Added {product.Title} with {obj.Count} items to cart successfully!";
+                }
                 else
                     TempData["error"] = "Something went wrong!";
             }

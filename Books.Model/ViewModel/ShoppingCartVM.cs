@@ -9,7 +9,7 @@ namespace Books.Model.ViewModel
     public class ShoppingCartVM
     {
         public IEnumerable<ShoppingCart> ShoppingCarts { get; set; }
-        public double TotalPrice;
-        public int TotalItems;
+        public int TotalItems { get; set; }
+        public OrderHeader OrderHeader { get; set; }
     }
 }

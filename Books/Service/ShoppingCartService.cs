@@ -1,11 +1,18 @@
 ﻿using Books.DataAcess.Repository;
 using Books.Model;
+using Books.Model.ViewModel;
 using Books.Service.IService;
+using Model.Utility;
+using Stripe.Checkout;
 
 namespace Books.Service
 {
     public class ShoppingCartService : IShoppingCartService
     {
+        public ShoppingCartService()
+        {
+        }
+
         private readonly IUnitOfWork _unit;
         public ShoppingCartService(IUnitOfWork unit)
         {
@@ -35,6 +42,103 @@ namespace Books.Service
             {
                 return false;
             }
+        }
+
+        public Session HandleAddSummary(ShoppingCartVM obj, User applicationUser)
+        {
+            try
+            {
+                // Set up list item
+                var shoppingCarts = _unit.ShoppingCartRepo
+                        .GetAllWithCondition(x => x.UserId == applicationUser.Id, includedProps: "Product");
+
+                // Set up order header
+                var orderHeader = new OrderHeader()
+                {
+                    PaymentStatus = SD.PaymentStatusPending,
+                    OrderStatus = SD.StatusPending,
+                    OrderDate = DateTime.Now,
+                    UserId = applicationUser.Id,
+                    Name = applicationUser.Name,
+                    PhoneNumber = applicationUser.PhoneNumber,
+                    StreetAddress = applicationUser.StreetAddress,
+                    City = applicationUser.City,
+                    State = applicationUser.State,
+                    PostalCode = applicationUser.PostalCode,
+                    SessionId = "",
+                    PaymentIntentId = "",
+                };
+
+                // Add OrderHeader
+                foreach (var cart in shoppingCarts)
+                {
+                    cart.FinalPrice = GetPriceBasedOnQuantity(cart.Count, cart.Product);
+                    orderHeader.OrderTotal += cart.FinalPrice * cart.Count;
+                }
+                _unit.OrderHeaderRepo.Add(orderHeader);
+                _unit.Save();
+
+                // Add OrderDetails
+                var orderDetails = new List<OrderDetail>();
+                foreach (var item in shoppingCarts)
+                {
+                    orderDetails.Add(new OrderDetail()
+                    {
+                        ProductId = item.ProductId,
+                        OrderHeaderId = orderHeader.Id,
+                        Count = item.Count,
+                        FinalPrice = item.FinalPrice,
+                    });
+                }
+                _unit.OrderDetailRepo.AddRange(orderDetails.AsEnumerable<OrderDetail>());
+                _unit.Save();
+
+                // Stripe
+                var lineItems = new List<SessionLineItemOptions>();
+                foreach (var item in shoppingCarts)
+                {
+                    lineItems.Add(new SessionLineItemOptions()
+                    {
+                        Quantity = item.Count,
+                        PriceData = new SessionLineItemPriceDataOptions()
+                        {
+                            Currency = "usd",
+                            UnitAmount = (long)item.FinalPrice * 100,
+                            ProductData = new SessionLineItemPriceDataProductDataOptions()
+                            {
+                                Name = item.Product.Title,
+                                Description = item.Product.Description,
+                            }
+                        }
+                    });
+                }
+                var domain = "https://localhost:44330";
+                var options = new SessionCreateOptions
+                {
+                    LineItems = lineItems,
+                    Mode = "payment",
+                    SuccessUrl = @$"{domain}/Customer/Cart/OrderConfirmation?id={orderHeader.Id}",
+                    CancelUrl = @$"{domain}/customer/home/index",
+                };
+                var service = new SessionService();
+                var session = service.Create(options);
+
+                // Add Status stripe
+                _unit.OrderHeaderRepo.UpdateStripePayment(orderHeader.Id, session.Id, session.PaymentIntentId);
+                _unit.Save();
+                return session;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private double GetPriceBasedOnQuantity(int count, Product p)
+        {
+            if (count <= 50) return p.Price;
+            else if (count <= 100) return p.Price50;
+            else return p.Price100;
         }
     }
 }
