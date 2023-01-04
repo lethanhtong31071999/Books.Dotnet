@@ -21,8 +21,8 @@ namespace Books.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            //DeleteData();
-            //CloneData();
+            //_businessLogic.ProductService.CreateDataBasedOn1Data();
+            //_businessLogic.ProductService.DeleteData();
             return View();
         }
 
@@ -53,12 +53,12 @@ namespace Books.Areas.Admin.Controllers
                     TempData["success"] = "Product was updated successfully!";
                 }
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Product");
             }
             else
             {
                 TempData["error"] = "The values in fields are wrong!";
-                return View(obj);
+                return View(_businessLogic.ProductService.HandleUpsertGetMethod(obj.Product.Id));
             }
         }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Books.DataAcess.Repository.IRepository
 {
-    public interface IOrderDetailRepo
+    public interface IOrderDetailRepo : IRepository<OrderDetail>
     {
         public void Update(OrderDetail obj);
     }
