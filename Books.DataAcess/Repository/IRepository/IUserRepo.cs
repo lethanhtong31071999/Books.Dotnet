@@ -1,4 +1,5 @@
 ﻿using Books.Model;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,7 @@ namespace Books.DataAcess.Repository.IRepository
 {
     public interface IUserRepo : IRepository<User>
     {
+        public void Update(User obj);
+        public IdentityRole GetRoleUserByUserId(string? userId);
     }
 }

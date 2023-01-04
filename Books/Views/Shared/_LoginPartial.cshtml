@@ -1,8 +1,12 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using Books.DataAcess.Repository
+@using Microsoft.AspNetCore.Identity
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-
+@inject IUnitOfWork unit
+@{
+    var user = unit.UserRepo.GetFirstOrDefault(x => x.Id == UserManager.GetUserId(User));
+}
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
@@ -12,7 +16,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a id="manage" class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+            <a id="manage" class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @user.Name!</a>
         </li>
         <li class="nav-item">
             <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
