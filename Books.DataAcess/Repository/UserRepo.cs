@@ -22,7 +22,7 @@ namespace Books.DataAcess.Repository
         {
             var objFromDba = base.GetFirstOrDefault(x => x.Id == obj.Id);
             if (objFromDba != null)
-            {
+                {
                 objFromDba.Name = obj.Name;
                 objFromDba.StreetAddress = obj.StreetAddress;
                 objFromDba.City = obj.City;
