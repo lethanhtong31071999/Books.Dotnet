@@ -105,7 +105,6 @@ namespace BookTemp.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            //var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
             var applicationUser = _unit.UserRepo.GetFirstOrDefault(x => x.Id == user.Id, isTrack: false);          
             if (applicationUser == null)
             {

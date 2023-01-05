@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
@@ -75,9 +76,11 @@ namespace BookTemp.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Confirm new password")]
             [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            [ValidateNever]
+            public string Role { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string role)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -89,6 +92,13 @@ namespace BookTemp.Areas.Identity.Pages.Account.Manage
             if (!hasPassword)
             {
                 return RedirectToPage("./SetPassword");
+            }
+            if(!String.IsNullOrEmpty(role))
+            {
+                Input = new InputModel()
+                {
+                    Role = role,
+                };
             }
 
             return Page();
