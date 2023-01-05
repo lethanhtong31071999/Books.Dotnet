@@ -21,7 +21,8 @@ namespace Books.Areas.Customer.Controllers
         {
             _unit = unit;
             _businessLogic = businessLogic;
-            Stripe.StripeConfiguration.ApiKey = "sk_test_51MM8LjFpSwCTDFNnB2stop6Qtxws02R3C8LOYIRm5Z66ejekrkEDcauTP0jkdxOugRxnUxGvmvTMA0IKaNmeNgl000jzQ4uK4N";
+            Stripe.StripeConfiguration.ApiKey
+                = "sk_test_51MM8LjFpSwCTDFNnB2stop6Qtxws02R3C8LOYIRm5Z66ejekrkEDcauTP0jkdxOugRxnUxGvmvTMA0IKaNmeNgl000jzQ4uK4N";
         }
         public IActionResult Index()
         {
@@ -46,10 +47,10 @@ namespace Books.Areas.Customer.Controllers
 
         public IActionResult Plus(int? cartId)
         {
-            if(cartId != null)
+            if (cartId != null)
             {
                 var objFromDba = _unit.ShoppingCartRepo.GetFirstOrDefault(x => x.Id == cartId);
-                if(objFromDba != null)
+                if (objFromDba != null)
                 {
                     _unit.ShoppingCartRepo.IncrementCount(objFromDba, 1);
                     _unit.Save();
@@ -122,24 +123,32 @@ namespace Books.Areas.Customer.Controllers
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claims = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             var applicationUser = _unit.UserRepo.GetFirstOrDefault(x => x.Id == claims.Value);
-            var session = _businessLogic.ShoppingCartService.HandleAddSummary(obj, applicationUser);
-            Response.Headers.Add("Location", session.Url);
+            if (applicationUser != null)
+            {
+                var session = _businessLogic.ShoppingCartService.HandleAddSummary(obj, applicationUser);
+                if (session == null) return RedirectToAction("OrderConfirmation", "Cart", new { id = obj.OrderHeader.Id });
+                Response.Headers.Add("Location", session.Url);
+            }
             return new StatusCodeResult(303);
         }
 
         public IActionResult OrderConfirmation(int id)
-        {          
-            var orderHeader = _unit.OrderHeaderRepo.GetFirstOrDefault(x => x.Id == id);
-            if(orderHeader != null)
+        {
+            var orderHeader = _unit.OrderHeaderRepo.GetFirstOrDefault(x => x.Id == id, includedProps: "User");
+            if (orderHeader != null && orderHeader.User != null)
             {
-                var service = new SessionService();
-                var session = service.Get(orderHeader.SessionId);
-
-                // check the stripe status
-                if (session.PaymentStatus.ToLower() == "paid")
+                // For all customers except for company
+                if (orderHeader.User.CompanyId == 0)
                 {
-                    _unit.OrderHeaderRepo.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
-                    _unit.Save();
+                    var service = new SessionService();
+                    var session = service.Get(orderHeader.SessionId);
+
+                    // check the stripe status
+                    if (session.PaymentStatus.ToLower() == "paid")
+                    {
+                        _unit.OrderHeaderRepo.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+                        _unit.Save();
+                    }
                 }
 
                 // Remove Shopping Cart List from Dba

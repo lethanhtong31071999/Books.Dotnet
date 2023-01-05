@@ -4,7 +4,6 @@
     <div class="alert alert-success mt-5" role="alert">
         <h4 class="alert-heading d-flex justify-content-between">
             Well done!
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </h4>
         <p>
             Aww yeah, you successfully paid your order (Id: <b>@Model</b>). You can track your order at
@@ -13,4 +12,5 @@
         <hr>
         <p class="mb-0">Whenever you need to, be sure to use our service. Thank you!</p>
     </div>
+    <a class="mt-2 btn btn-success" asp-action="Index" asp-controller="Home" asp-area="Customer">Continue to buy!</a>
 </div>

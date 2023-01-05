@@ -69,6 +69,13 @@ namespace Books.Service
                     PaymentIntentId = "",
                 };
 
+                // Company dont need to pay for orders in advance
+                if(applicationUser.CompanyId != 0)
+                {
+                    orderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
+                    orderHeader.OrderStatus = SD.StatusApproved;
+                }
+
                 // Add OrderHeader
                 foreach (var cart in shoppingCarts)
                 {
@@ -93,7 +100,14 @@ namespace Books.Service
                 _unit.OrderDetailRepo.AddRange(orderDetails.AsEnumerable<OrderDetail>());
                 _unit.Save();
 
-                // Stripe
+                // For Company user
+                if(applicationUser.CompanyId != 0)
+                {
+                    obj.OrderHeader.Id = orderHeader.Id;
+                    return null;
+                }
+
+                // Stripe for all type of customer except for Company
                 var lineItems = new List<SessionLineItemOptions>();
                 foreach (var item in shoppingCarts)
                 {
