@@ -24,8 +24,20 @@ namespace Books.Areas.Customer.Controllers
             Stripe.StripeConfiguration.ApiKey
                 = "sk_test_51MM8LjFpSwCTDFNnB2stop6Qtxws02R3C8LOYIRm5Z66ejekrkEDcauTP0jkdxOugRxnUxGvmvTMA0IKaNmeNgl000jzQ4uK4N";
         }
-        public IActionResult Index()
+        public IActionResult Index(int? orderId)
         {
+            // Remove order from Dba when customer cancel payment
+            if(orderId != null)
+            {
+                var orderHeaderFromDba = _unit.OrderHeaderRepo.GetFirstOrDefault(x => x.Id == orderId);
+                var orderDetailsFromDba = _unit.OrderDetailRepo.GetAllWithCondition(x => x.OrderHeaderId == orderId).AsEnumerable<OrderDetail>();
+                if (orderHeaderFromDba != null)
+                {
+                    _unit.OrderHeaderRepo.Remove(orderHeaderFromDba);
+                    _unit.OrderDetailRepo.RemoveRange(orderDetailsFromDba);
+                    _unit.Save();
+                }
+            }
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claims = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             _shoppingCartVM = new ShoppingCartVM()
@@ -138,7 +150,7 @@ namespace Books.Areas.Customer.Controllers
             if (orderHeader != null && orderHeader.User != null)
             {
                 // For all customers except for company
-                if (orderHeader.User.CompanyId == 0)
+                if (orderHeader.User.CompanyId == null || orderHeader.User.CompanyId == 0)
                 {
                     var service = new SessionService();
                     var session = service.Get(orderHeader.SessionId);

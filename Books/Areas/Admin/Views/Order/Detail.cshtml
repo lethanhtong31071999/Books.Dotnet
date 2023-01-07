@@ -1,0 +1,176 @@
+﻿@model OrderVM
+@using Model.Utility
+
+<form method="post" asp-action="UpdateOrder" asp-controller="Order" asp-area="Admin" >
+    <input hidden asp-for="OrderHeader.Id" />
+    <div class="container mt-3">
+        <div class="card">
+            <div class="card-header bg-dark text-light ml-0 container">
+                <div class="row">
+                    <div class="col-12 d-none d-md-block col-md-6 pb-1">
+                        <h4 class="text-light">Order Detail</h4>
+                    </div>
+                    <div class="col-12 col-md-6 d-flex justify-content-end">
+                        <a asp-action="Index" asp-controller="Order" class="text-white-50">Back to order</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container rounded p-2">
+                    <div class="row">
+                        <div class="col-12 col-lg-6 pb-4">
+                            <div class="row">
+                                <h5 class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="text-info">Detail Information</span>
+                                </h5>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Name</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.Name" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Phone</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.PhoneNumber" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Address</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.StreetAddress" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">City</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.City" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">State</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.State" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Zip Code</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.PostalCode" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Email</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.User.Email" readonly type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Order Date</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.OrderDate" readonly type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Carrier</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.Carrier" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Tracking</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.TrackingNumber" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Shipping Date</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.ShippingDate" readonly type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Transaction ID</div>
+                                <div class="col-9">
+                                    <input type="text" asp-for="OrderHeader.PaymentIntentId" readonly class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Payment Due Date</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.PaymentDueDate" readonly type="text" class="form-control" />
+
+                                </div>
+                                <div class="col-3">Payment Date</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.PaymentDate" readonly type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Payment Status</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.PaymentStatus" readonly type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <input type="submit" class="btn btn-warning form-control my-1" value="Update Order Details" />
+
+
+                        </div>
+                        <div class="col-12 col-lg-5 offset-lg-1">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="text-info">Summary</h5>
+                            </div>
+                            <ul class="list-group mb-3">
+                                <li class="list-group-item text-center bg-dark"><strong class="text-light">@Model.OrderHeader.OrderStatus.ToUpper()</strong></li>
+                                <li class="list-group-item d-flex justify-content-between p-2">
+                                    <div class="row container gy-3">
+                                        @foreach (var item in Model.OrderDetails)
+                                        {
+                                            <div class="col-7">
+                                                <h6 class="my-0 text-info">@item.Product.Title</h6>
+                                            </div>
+                                            <div class="col-5">
+                                                <p class="text-success">@item.FinalPrice.ToString("c") * @item.Count</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </li>
+                                <li class="list-group-item bg-secondary">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <h5 class="text-info">Coupon</h5>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <strong class="text-success align-baseline">-50.00$</strong>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item bg-info">
+                                    <div class="row container">
+                                        <div class="col-6">
+                                            <h5 class="text-white">Total</h5>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <h5 class="text-white">@Model.OrderHeader.OrderTotal.ToString("c")</h5>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            @if (!Model.IsCustomer)
+                            {
+                                // Admin and Employee
+                                <input type="submit" class="btn btn-primary form-control my-1" value="Start Processing" />
+                                <input type="submit" class="btn btn-primary form-control my-1" value="Ship Order" />
+                                <input type="submit" class="btn btn-success form-control my-1" value="Pay Now" />
+                            }
+                            <input type="submit" class="btn btn-danger form-control my-1" value="Cancel Order" 
+                                disabled=@(Model.OrderHeader.PaymentStatus == SD.StatusShipped && Model.IsCustomer) />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

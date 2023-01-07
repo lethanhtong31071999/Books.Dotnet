@@ -70,7 +70,7 @@ namespace Books.Service
                 };
 
                 // Company dont need to pay for orders in advance
-                if(applicationUser.CompanyId != 0)
+                if(applicationUser.CompanyId != null && applicationUser.CompanyId > 0)
                 {
                     orderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
                     orderHeader.OrderStatus = SD.StatusApproved;
@@ -101,7 +101,7 @@ namespace Books.Service
                 _unit.Save();
 
                 // For Company user
-                if(applicationUser.CompanyId != 0)
+                if(applicationUser.CompanyId != null && applicationUser.CompanyId > 0)
                 {
                     obj.OrderHeader.Id = orderHeader.Id;
                     return null;
@@ -132,7 +132,7 @@ namespace Books.Service
                     LineItems = lineItems,
                     Mode = "payment",
                     SuccessUrl = @$"{domain}/Customer/Cart/OrderConfirmation?id={orderHeader.Id}",
-                    CancelUrl = @$"{domain}/customer/home/index",
+                    CancelUrl = @$"{domain}/customer/Cart/Index?orderId={orderHeader.Id}",
                 };
                 var service = new SessionService();
                 var session = service.Create(options);

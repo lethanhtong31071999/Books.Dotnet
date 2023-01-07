@@ -1,0 +1,63 @@
+﻿@model IEnumerable<OrderHeader>
+@{
+    ViewData["Title"] = "Index";
+    var status = Context.Request.Query["status"];
+    var inProcess = "btn btn-outline-dark";
+    var paymentPending = "btn btn-outline-dark";
+    var completed = "btn btn-outline-dark";
+    var approved = "btn btn-outline-dark";
+    var all = "btn btn-outline-dark";
+
+    switch (status)
+    {
+        case "inprocess":
+            inProcess = "btn btn-dark";
+            break;
+        case "pending":
+            paymentPending = "btn btn-dark";
+            break;
+        case "completed":
+            completed = "btn btn-dark";
+            break;
+        case "approved":
+            approved = "btn btn-dark";
+            break;
+        default:
+            all = "btn btn-dark";
+            break;
+    }
+}
+
+<div class="container-fuild my-5">
+    <div class="btn-group d-flex justify-content-end" role="group">
+        <div class="btn-group" role="group" aria-label="Basic outlined example">
+            <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="inprocess" class=@inProcess>1. In process</a>
+            <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="pending" class=@paymentPending>2. Payment Pending</a>
+            <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="approved" class=@approved>3. Approved</a>
+            <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="completed" class=@completed>4. Completed</a>
+            <a type="button" asp-action="Index" asp-controller="Order" class=@all>All</a>
+        </div>
+    </div>
+    <div class="mt-3">
+        <table id="dataTableAdmin" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>City</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Func</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/site.js"></script>
+<script src="~/js/order_management.js"></script>
+}
+

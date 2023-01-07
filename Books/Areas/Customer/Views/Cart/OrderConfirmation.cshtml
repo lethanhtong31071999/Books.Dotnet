@@ -7,7 +7,7 @@
         </h4>
         <p>
             Aww yeah, you successfully paid your order (Id: <b>@Model</b>). You can track your order at
-            <a href="#" class="alert-link">here</a>
+            <a href=@Url.Action("Detail", "Order", new {orderId = Model, area = "Admin"}) class="alert-link">here</a>
         </p>
         <hr>
         <p class="mb-0">Whenever you need to, be sure to use our service. Thank you!</p>

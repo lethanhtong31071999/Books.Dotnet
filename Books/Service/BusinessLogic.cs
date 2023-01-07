@@ -15,6 +15,7 @@ namespace Books.Service
         public ICompanyService CompanyService { get;}
         public IUserService UserService { get;}
         public IShoppingCartService ShoppingCartService { get;} 
+        public IOrderManagementService OrderManagementService { get;}
         public BusinessLogic(IUnitOfWork unit, IWebHostEnvironment webHostEnv)
         {
             _unit = unit;
@@ -23,6 +24,7 @@ namespace Books.Service
             CompanyService = new CompanyService(_unit);
             UserService = new UserService(_unit);
             ShoppingCartService = new ShoppingCartService(_unit);
+            OrderManagementService = new OrderManagementService(_unit);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Books.DataAcess.Repository
         }
         public void Update(CoverType obj)
         {
-            var objFromDba = base.GetFirstOrDefault(x => x.Id == obj.Id, isTrack:false);
+            var objFromDba = base.GetFirstOrDefault(x => x.Id == obj.Id, isTracked:false);
             if(objFromDba != null)
             {
                 objFromDba.Name = obj.Name;

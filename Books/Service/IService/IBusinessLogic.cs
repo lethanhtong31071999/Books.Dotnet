@@ -10,5 +10,6 @@ namespace Books.BusinessLogic.IService
         public ICompanyService CompanyService { get; } 
         public IUserService UserService { get; }
         public IShoppingCartService ShoppingCartService { get; }
+        public IOrderManagementService OrderManagementService { get; }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Books.Data;
 using Books.DataAcess.Repository.IRepository;
 using Books.Model;
+using Books.Model.PaginationModel;
+using Model.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,13 +38,66 @@ namespace Books.DataAcess.Repository
 
         public void UpdateStripePayment(int id, string sessionId, string paymentIntentId)
         {
-            var orderHeader = base.GetFirstOrDefault(x => id == x.Id, isTrack: true);
-            if(orderHeader != null)
+            var orderHeader = base.GetFirstOrDefault(x => id == x.Id, isTracked: true);
+            if (orderHeader != null)
             {
                 orderHeader.PaymentDate = DateTime.Now;
                 orderHeader.PaymentIntentId = paymentIntentId;
                 orderHeader.SessionId = sessionId;
             }
+        }
+
+        public PaginatedOrderHeader GetAllWithPagination(PaginatedOrderHeader pagingModel, string includedProps = null)
+        {
+            // Set up based on status and role
+            IQueryable<OrderHeader> query = _db.OrderHeaders;
+            if(!String.IsNullOrEmpty(pagingModel.Status))
+            {
+                switch (pagingModel.Status)
+                {
+                    case "pending":
+                        query = query.Where(x => x.PaymentStatus == SD.PaymentStatusPending);
+                        break;
+                    case "completed":
+                        query = query.Where(x => x.OrderStatus == SD.StatusShipped);
+                        break;
+                    case "approved":
+                        query = query.Where(x => x.OrderStatus == SD.StatusApproved);
+                        break;
+                    case "inprocess":
+                        query = query.Where(x => x.OrderStatus == SD.StatusInProcess);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if(pagingModel.IsCustomer)
+            {
+                query = query.Where(x=>x.UserId == pagingModel.CustomerId);
+            }
+            pagingModel.RecordsTotal = query.Count();
+
+
+            var textSearch = pagingModel.Filter.TextSearch.ToLower();
+            if (textSearch != null && textSearch.Trim().Length > 0)
+            {
+                // Filter with text search
+                query = query
+                    .Where(x => x.Name.ToLower().Contains(textSearch)
+                            || x.PhoneNumber.ToLower().Contains(textSearch)
+                            || x.Id.ToString().Contains(textSearch))
+                    .Skip(pagingModel.Filter.Start).Take(pagingModel.Filter.Length);
+                pagingModel.Filter.Start = 0;
+                pagingModel.RecordsFiltered = query.Count();
+            }
+            else
+            {
+                // Filter without search
+                query = query.Skip(pagingModel.Filter.Start).Take(pagingModel.Filter.Length);
+            }
+            query = base.IncludeProperty(query, includedProps);
+            pagingModel.Data = query.ToList<OrderHeader>();
+            return pagingModel;
         }
     }
 }

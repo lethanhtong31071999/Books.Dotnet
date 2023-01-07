@@ -22,7 +22,7 @@ namespace Books.DataAcess.Repository
         public void Update(Product obj)
         {
             if (obj == null) return;
-            var objFromDba = base.GetFirstOrDefault(x => x.Id == obj.Id, isTrack: false);
+            var objFromDba = base.GetFirstOrDefault(x => x.Id == obj.Id, isTracked: false);
             if (objFromDba != null)
             {
                 objFromDba.Title = obj.Title;
@@ -54,7 +54,6 @@ namespace Books.DataAcess.Repository
                     .Skip(pagingModel.Filter.Start).Take(pagingModel.Filter.Length);
                 pagingModel.Filter.Start = 0;
                 pagingModel.RecordsFiltered = query.Count();
-                pagingModel.RecordsTotal = query.Count();
             }
             else
             {
