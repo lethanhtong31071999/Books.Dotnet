@@ -4,6 +4,7 @@ using Books.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Books.DataAcess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230108124725_Update-Order-Header")]
+    partial class UpdateOrderHeader
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,7 +79,7 @@ namespace Books.DataAcess.Migrations
                     b.ToTable("CoverTypes");
                 });
 
-            modelBuilder.Entity("Books.Model.DetailProcess", b =>
+            modelBuilder.Entity("Books.Model.DetailOrderProcess", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -85,26 +87,23 @@ namespace Books.DataAcess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("OrderHeaderId")
-                        .IsRequired()
+                    b.Property<int>("OrderID")
                         .HasColumnType("int");
 
-                    b.Property<string>("ProcessName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UpdatedById")
-                        .HasColumnType("nvarchar(450)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedProcessName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderHeaderId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("DetailProcesses");
+                    b.ToTable("DetailOrderProcesses");
                 });
 
             modelBuilder.Entity("Books.Model.OrderDetail", b =>
@@ -557,23 +556,6 @@ namespace Books.DataAcess.Migrations
                     b.HasIndex("CompanyId");
 
                     b.HasDiscriminator().HasValue("User");
-                });
-
-            modelBuilder.Entity("Books.Model.DetailProcess", b =>
-                {
-                    b.HasOne("Books.Model.OrderHeader", "OrderHeader")
-                        .WithMany()
-                        .HasForeignKey("OrderHeaderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Books.Model.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById");
-
-                    b.Navigation("OrderHeader");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Books.Model.OrderDetail", b =>
