@@ -42,7 +42,7 @@ namespace Books.Controllers
             if (productId != null || productId > 0)
             {
                 var product = _unit.ProductRepo
-                    .GetFirstOrDefault(x => x.Id == productId, isTrack: false, includedProps: "Category,CoverType");
+                    .GetFirstOrDefault(x => x.Id == productId, isTracked: false, includedProps: "Category,CoverType");
                 if (product != null)
                 {
                     return View(new ShoppingCart ()

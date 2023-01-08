@@ -49,7 +49,7 @@ namespace Books.BusinessLogic
             else
             {
                 // Update Function
-                var obj = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == id, isTrack: false);
+                var obj = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == id, isTracked: false);
                 if (obj != null)
                 {
                     viewModel.Product = obj;
@@ -90,7 +90,7 @@ namespace Books.BusinessLogic
         {
             try
             {
-                var objFromDba = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == id, isTrack: true);
+                var objFromDba = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == id, isTracked: true);
                 var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, objFromDba.ImageUrl);
                 if (System.IO.File.Exists(oldPath))
                 {

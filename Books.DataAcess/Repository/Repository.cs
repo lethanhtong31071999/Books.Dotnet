@@ -62,13 +62,11 @@ namespace Books.DataAcess.Repository
         public T GetFirstOrDefault(Expression<Func<T, bool>> filter, bool isTracked = true, string includedProps = null)
         {
             IQueryable<T> query = _dbSet;
-            if(isTracked)
+            if(!isTracked)
             {
-                query = query.Where(filter);
-            } else
-            {
-                query = query.AsNoTracking().Where(filter);
+                query = query.AsNoTracking();
             }
+            query = query.Where(filter);
             return IncludeProperty(query, includedProps).FirstOrDefault<T>();
         }
 

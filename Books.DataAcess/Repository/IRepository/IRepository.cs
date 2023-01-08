@@ -11,7 +11,7 @@ namespace Books.DataAcess.Repository.IRepository
     public interface IRepository<T> where T : class
     {
         // Get
-        T GetFirstOrDefault(Expression<Func<T, bool>> filter, bool isTrack = true, string includedProps = null);
+        T GetFirstOrDefault(Expression<Func<T, bool>> filter, bool isTracked = true, string includedProps = null);
         IEnumerable<T> GetAll(string includedProps = null);
         IEnumerable<T> GetAllWithCondition(Expression<Func<T, bool>> filter, string includedProps = null);
 

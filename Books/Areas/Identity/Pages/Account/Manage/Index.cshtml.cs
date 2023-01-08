@@ -66,7 +66,7 @@ namespace BookTemp.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             Username = userName;
             var userRole = _unit.UserRepo.GetRoleUserByUserId(user.Id);
-            var applicationUser = _unit.UserRepo.GetFirstOrDefault(x => x.Id == user.Id, isTrack: false);
+            var applicationUser = _unit.UserRepo.GetFirstOrDefault(x => x.Id == user.Id, isTracked: false);
             Input = new InputModel
             {
                 Name = applicationUser.Name,
@@ -105,7 +105,7 @@ namespace BookTemp.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            var applicationUser = _unit.UserRepo.GetFirstOrDefault(x => x.Id == user.Id, isTrack: false);          
+            var applicationUser = _unit.UserRepo.GetFirstOrDefault(x => x.Id == user.Id, isTracked: false);          
             if (applicationUser == null)
             {
                 StatusMessage = "Unexpected error when trying to set phone number.";

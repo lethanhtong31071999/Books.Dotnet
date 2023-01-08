@@ -4,8 +4,11 @@
     var status = Context.Request.Query["status"];
     var inProcess = "btn btn-outline-dark";
     var paymentPending = "btn btn-outline-dark";
-    var completed = "btn btn-outline-dark";
     var approved = "btn btn-outline-dark";
+    var shipped = "btn btn-outline-dark";
+    var completed = "btn btn-outline-dark";
+    var cancelled = "btn btn-outline-dark";
+    var refunded = "btn btn-outline-dark";
     var all = "btn btn-outline-dark";
 
     switch (status)
@@ -16,11 +19,20 @@
         case "pending":
             paymentPending = "btn btn-dark";
             break;
+        case "approved":
+            approved = "btn btn-dark";
+            break;
+        case "shipped":
+            shipped = "btn btn-dark";
+            break;
         case "completed":
             completed = "btn btn-dark";
             break;
-        case "approved":
-            approved = "btn btn-dark";
+        case "cancelled":
+            cancelled = "btn btn-dark";
+            break;
+        case "refunded":
+            refunded = "btn btn-dark";
             break;
         default:
             all = "btn btn-dark";
@@ -34,7 +46,10 @@
             <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="inprocess" class=@inProcess>1. In process</a>
             <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="pending" class=@paymentPending>2. Payment Pending</a>
             <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="approved" class=@approved>3. Approved</a>
-            <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="completed" class=@completed>4. Completed</a>
+            <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="shipped" class=@shipped>4. Shipped</a>
+            <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="completed" class=@completed>5. Completed</a>
+            <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="cancelled" class=@cancelled>6. Cancelled</a>
+            <a type="button" asp-action="Index" asp-controller="Order" asp-route-status="refunded" class=@refunded>7. Refuned</a>
             <a type="button" asp-action="Index" asp-controller="Order" class=@all>All</a>
         </div>
     </div>

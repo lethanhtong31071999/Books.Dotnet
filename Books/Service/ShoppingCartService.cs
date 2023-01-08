@@ -137,8 +137,8 @@ namespace Books.Service
                 var service = new SessionService();
                 var session = service.Create(options);
 
-                // Add Status stripe
-                _unit.OrderHeaderRepo.UpdateStripePayment(orderHeader.Id, session.Id, session.PaymentIntentId);
+                orderHeader.SessionId = session.Id;
+                _unit.OrderHeaderRepo.Update(orderHeader);
                 _unit.Save();
                 return session;
             }

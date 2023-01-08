@@ -27,7 +27,7 @@ namespace Books.Service
             else
             {
                 // Update Function
-                var obj = _unit.CompanyRepo.GetFirstOrDefault(x => x.Id == id, isTrack: false);
+                var obj = _unit.CompanyRepo.GetFirstOrDefault(x => x.Id == id, isTracked: false);
                 return obj != null ? obj : new Company();
             }
         }
@@ -60,7 +60,7 @@ namespace Books.Service
         {
             try
             {
-                var objFromDba = _unit.CompanyRepo.GetFirstOrDefault(x => x.Id == id, isTrack: true);
+                var objFromDba = _unit.CompanyRepo.GetFirstOrDefault(x => x.Id == id, isTracked: true);
                 if (objFromDba != null)
                 {
                     _unit.CompanyRepo.Remove(objFromDba);

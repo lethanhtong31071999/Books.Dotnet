@@ -40,29 +40,26 @@ namespace Books.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateOrder(OrderVM obj)
+        public IActionResult UpdateOrder(OrderVM obj, string? nextStatus)
         {
-            var orderHeaderFromDba = _unit.OrderHeaderRepo.GetFirstOrDefault(x => x.Id == obj.OrderHeader.Id, isTrack: false);
-            if (orderHeaderFromDba != null)
+            if(obj.OrderHeader != null)
             {
-                orderHeaderFromDba.Name = obj.OrderHeader.Name;
-                orderHeaderFromDba.PhoneNumber = obj.OrderHeader.PhoneNumber;
-                orderHeaderFromDba.StreetAddress = obj.OrderHeader.StreetAddress;
-                orderHeaderFromDba.City = obj.OrderHeader.City;
-                orderHeaderFromDba.State = obj.OrderHeader.State;
-                orderHeaderFromDba.PostalCode = obj.OrderHeader.PostalCode;
-                if (!String.IsNullOrEmpty(obj.OrderHeader.Carrier))
-                {
-                    orderHeaderFromDba.Carrier = obj.OrderHeader.Carrier;
-                }
-                if (!String.IsNullOrEmpty(obj.OrderHeader.TrackingNumber))
-                {
-                    orderHeaderFromDba.TrackingNumber = obj.OrderHeader.TrackingNumber;
-                }
-                _unit.OrderHeaderRepo.Update(orderHeaderFromDba);
-                _unit.Save();
+                _businessLogic.OrderManagementService.UpdateDetailInformation(obj.OrderHeader);                
+                TempData["success"] = "Update order detail successfully!";
             }
+            
             return RedirectToAction("Detail", "Order", new { orderId = obj.OrderHeader.Id });
+        }
+
+        [HttpGet]
+        public IActionResult UpdateStatusOrder(int orderId, string? updatedStatus)
+        {
+            if (!String.IsNullOrEmpty(updatedStatus) && orderId != 0)
+            {
+                _businessLogic.OrderManagementService.UpdateOrderStatus(orderId, updatedStatus);
+                TempData["success"] = "Update the order status successfully!";
+            }
+            return RedirectToAction("Detail", "Order", new { orderId = orderId });
         }
 
         #region API Call

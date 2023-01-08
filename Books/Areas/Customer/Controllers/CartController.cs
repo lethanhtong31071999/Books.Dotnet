@@ -152,13 +152,15 @@ namespace Books.Areas.Customer.Controllers
                 // For all customers except for company
                 if (orderHeader.User.CompanyId == null || orderHeader.User.CompanyId == 0)
                 {
+                    // Add Status stripe
                     var service = new SessionService();
                     var session = service.Get(orderHeader.SessionId);
 
-                    // check the stripe status
+                    // Update the stripe status 
                     if (session.PaymentStatus.ToLower() == "paid")
                     {
                         _unit.OrderHeaderRepo.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+                        _unit.OrderHeaderRepo.UpdateStripePayment(orderHeader.Id, session.Id, session.PaymentIntentId);
                         _unit.Save();
                     }
                 }

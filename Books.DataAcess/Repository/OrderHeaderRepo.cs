@@ -19,17 +19,18 @@ namespace Books.DataAcess.Repository
             _db = db;
         }
 
-        public void Update(OrderHeader obj)
+        public void Update(OrderHeader objFromDba)
         {
+                _db.Update(objFromDba);
         }
 
         public void UpdateStatus(int id, string orderStatus, string? paymentStatus = null)
         {
-            var orderFromDb = _db.OrderHeaders.FirstOrDefault(u => u.Id == id);
+            var orderFromDb = base.GetFirstOrDefault(u => u.Id == id);
             if (orderFromDb != null)
             {
                 orderFromDb.OrderStatus = orderStatus;
-                if (paymentStatus != null)
+                if (!String.IsNullOrEmpty(paymentStatus))
                 {
                     orderFromDb.PaymentStatus = paymentStatus;
                 }
@@ -38,7 +39,7 @@ namespace Books.DataAcess.Repository
 
         public void UpdateStripePayment(int id, string sessionId, string paymentIntentId)
         {
-            var orderHeader = base.GetFirstOrDefault(x => id == x.Id, isTracked: true);
+            var orderHeader = base.GetFirstOrDefault(x => id == x.Id);
             if (orderHeader != null)
             {
                 orderHeader.PaymentDate = DateTime.Now;
@@ -59,13 +60,22 @@ namespace Books.DataAcess.Repository
                         query = query.Where(x => x.PaymentStatus == SD.PaymentStatusPending);
                         break;
                     case "completed":
-                        query = query.Where(x => x.OrderStatus == SD.StatusShipped);
+                        query = query.Where(x => x.OrderStatus == SD.StatusCompleted);
                         break;
                     case "approved":
                         query = query.Where(x => x.OrderStatus == SD.StatusApproved);
                         break;
                     case "inprocess":
                         query = query.Where(x => x.OrderStatus == SD.StatusInProcess);
+                        break;
+                    case "shipped":
+                        query = query.Where(x => x.OrderStatus == SD.StatusShipped);
+                        break;
+                    case "cancelled":
+                        query = query.Where(x => x.OrderStatus == SD.StatusCancelled);
+                        break;
+                    case "refunded":
+                        query = query.Where(x => x.OrderStatus == SD.StatusRefunded);
                         break;
                     default:
                         break;
