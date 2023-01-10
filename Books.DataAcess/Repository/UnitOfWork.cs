@@ -19,6 +19,7 @@ namespace Books.DataAcess.Repository
         public IShoppingCartRepo ShoppingCartRepo { get; private set; }
         public IOrderDetailRepo OrderDetailRepo { get; private set; }
         public IOrderHeaderRepo OrderHeaderRepo { get; private set; }
+        public IDetailProcessRepo DetailProcessRepo { get; private set; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -30,6 +31,7 @@ namespace Books.DataAcess.Repository
             UserRepo = new UserRepo(_db);
             OrderDetailRepo = new OrderDetailRepo(_db);
             OrderHeaderRepo = new OrderHeaderRepo(_db);
+            DetailProcessRepo = new DetailProcessRepo(_db);
         }
 
         public void Save()

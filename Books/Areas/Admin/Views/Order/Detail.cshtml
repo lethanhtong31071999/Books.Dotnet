@@ -2,27 +2,34 @@
 @using Model.Utility
 
 @{
-    var statusButtonHref = @$"/Admin/Order/UpdateStatusOrder?orderId={Model.OrderHeader.Id}&updatedStatus=";
+    string statusButtonHref = @$"/Admin/Order/UpdateStatusOrder?orderId={Model.OrderHeader.Id}&updatedStatus=";
+    bool isUneditableDetailInformation = Model.OrderHeader.OrderStatus == SD.StatusShipped
+                                || Model.OrderHeader.OrderStatus == SD.StatusCompleted
+                                || Model.OrderHeader.OrderStatus == SD.StatusCancelled
+                                || Model.OrderHeader.OrderStatus == SD.StatusRefunded;
+
+    var isVisibleRefund = (Model.OrderHeader.PaymentStatus == SD.PaymentStatusApproved) && (Model.OrderHeader.OrderStatus == SD.StatusCancelled);
 }
 
-<form method="post" asp-action="UpdateOrder" asp-controller="Order" asp-area="Admin">
-    <input hidden asp-for="OrderHeader.Id" />
-    <div class="container mt-3">
-        <div class="card">
-            <div class="card-header bg-dark text-light ml-0 container">
-                <div class="row">
-                    <div class="col-12 d-none d-md-block col-md-6 pb-1">
-                        <h4 class="text-light">Order Detail</h4>
-                    </div>
-                    <div class="col-12 col-md-6 d-flex justify-content-end">
-                        <a asp-action="Index" asp-controller="Order" class="text-white-50">Back to order</a>
-                    </div>
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header bg-dark text-light ml-0 container">
+            <div class="row">
+                <div class="col-12 d-none d-md-block col-md-6 pb-1">
+                    <h4 class="text-light">Order Detail</h4>
+                </div>
+                <div class="col-12 col-md-6 d-flex justify-content-end">
+                    <a asp-action="Index" asp-controller="Order" class="text-white-50">Back to order</a>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="container rounded p-2">
-                    <div class="row">
-                        <div class="col-12 col-lg-6 pb-4">
+        </div>
+        <div class="card-body">
+            <div class="container rounded p-2">
+                <div class="row">
+                    @*Detail Information*@
+                    <div class="col-12 col-lg-6 pb-4">
+                        <form method="post" asp-action="UpdateOrder" asp-controller="Order" asp-area="Admin">
+                            <input hidden asp-for="OrderHeader.Id" />
                             <div class="row">
                                 <h5 class="d-flex justify-content-between align-items-center mb-3">
                                     <span class="text-info">Detail Information</span>
@@ -31,166 +38,220 @@
                             <div class="row my-1">
                                 <div class="col-3">Name</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.Name" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.Name" disabled=@(Model.IsCustomer || isUneditableDetailInformation) type="text" class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Phone</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.PhoneNumber" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.PhoneNumber" disabled=@(Model.IsCustomer || isUneditableDetailInformation) type="text" class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Address</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.StreetAddress" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.StreetAddress" disabled=@(Model.IsCustomer || isUneditableDetailInformation) type="text" class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">City</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.City" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.City" disabled=@(Model.IsCustomer || isUneditableDetailInformation) type="text" class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">State</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.State" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.State" disabled=@(Model.IsCustomer || isUneditableDetailInformation) type="text" class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Zip Code</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.PostalCode" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.PostalCode" disabled=@(Model.IsCustomer || isUneditableDetailInformation) type="text" class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Email</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.User.Email" readonly type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.User.Email" disabled type="text" class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Order Date</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.OrderDate" readonly type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.OrderDate" disabled type="text" class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Carrier</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.Carrier" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.Carrier" disabled=@(Model.IsCustomer || isUneditableDetailInformation) type="text" class="form-control" id="carrier" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Tracking</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.TrackingNumber" readonly=@(Model.IsCustomer) type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.TrackingNumber" disabled=@(Model.IsCustomer || isUneditableDetailInformation) type="text" class="form-control" id="trackingNumber" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Shipping Date</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.ShippingDate" readonly type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.ShippingDate" disabled type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Complete Date</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.CompletingDate" disabled type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Cancel Date</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.CancellingDate" disabled type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Refund Date</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.RefundingDate" disabled type="text" class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Transaction ID</div>
                                 <div class="col-9">
-                                    <input type="text" asp-for="OrderHeader.PaymentIntentId" readonly class="form-control" />
+                                    <input type="text" asp-for="OrderHeader.PaymentIntentId" disabled class="form-control" />
                                 </div>
                             </div>
-                            <div class="row my-1">
-                                <div class="col-3">Payment Due Date</div>
-                                <div class="col-9">
-                                    <input asp-for="OrderHeader.PaymentDueDate" readonly type="text" class="form-control" />
-
+                            @if (SD.PaymentStatusDelayedPayment == Model.OrderHeader.PaymentStatus)
+                            {
+                                <div class="row my-1">
+                                    <div class="col-3">Payment Due Date</div>
+                                    <div class="col-9">
+                                        <input asp-for="OrderHeader.PaymentDueDate" disabled type="text" class="form-control" />
+                                    </div>
                                 </div>
+                            }
+                            <div class="row my-1">
                                 <div class="col-3">Payment Date</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.PaymentDate" readonly type="text" class="form-control" />
+                                    <input type="text" asp-for="OrderHeader.PaymentDate" disabled class="form-control" />
                                 </div>
                             </div>
                             <div class="row my-1">
                                 <div class="col-3">Payment Status</div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.PaymentStatus" readonly type="text" class="form-control" />
+                                    <input asp-for="OrderHeader.PaymentStatus" disabled type="text" class="form-control" />
                                 </div>
                             </div>
-                            <input type="submit" class="btn btn-warning form-control my-1" value="Update Order Details" />
-
+                            <input type="submit" disabled=@(isUneditableDetailInformation || Model.IsCustomer) class="btn btn-warning form-control my-1" value="Update Order Details" />
+                        </form>
+                    </div>
+                    @*SUMARY*@
+                    <div class="col-12 col-lg-5 offset-lg-1">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="text-info">Summary</h5>
                         </div>
-                        <div class="col-12 col-lg-5 offset-lg-1">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="text-info">Summary</h5>
-                            </div>
-                            <ul class="list-group mb-3">
-                                <li class="list-group-item text-center bg-dark"><strong class="text-light">@Model.OrderHeader.OrderStatus.ToUpper()</strong></li>
-                                <li class="list-group-item d-flex justify-content-between p-2">
-                                    <div class="row container gy-3">
-                                        @foreach (var item in Model.OrderDetails)
-                                        {
-                                            <div class="col-7">
-                                                <h6 class="my-0 text-info">@item.Product.Title</h6>
-                                            </div>
-                                            <div class="col-5">
-                                                <p class="text-success">@item.FinalPrice.ToString("c") * @item.Count</p>
-                                            </div>
-                                        }
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item text-center bg-dark"><strong class="text-light">@Model.OrderHeader.OrderStatus.ToUpper()</strong></li>
+                            <li class="list-group-item d-flex justify-content-between p-2">
+                                <div class="row container gy-3">
+                                    @foreach (var item in Model.OrderDetails)
+                                    {
+                                        <div class="col-7">
+                                            <h6 class="my-0 text-info">@item.Product.Title</h6>
+                                        </div>
+                                        <div class="col-5">
+                                            <p class="text-success">@item.FinalPrice.ToString("c") * @item.Count</p>
+                                        </div>
+                                    }
+                                </div>
+                            </li>
+                            <li class="list-group-item bg-secondary">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h5 class="text-info">Coupon</h5>
                                     </div>
-                                </li>
-                                <li class="list-group-item bg-secondary">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <h5 class="text-info">Coupon</h5>
-                                        </div>
-                                        <div class="col-6 text-right">
-                                            <strong class="text-dark align-baseline">-50.00$</strong>
-                                        </div>
+                                    <div class="col-6 text-right">
+                                        <strong class="text-dark align-baseline">-50.00$</strong>
                                     </div>
-                                </li>
-                                <li class="list-group-item bg-success">
-                                    <div class="row container">
-                                        <div class="col-6">
-                                            <h5 class="text-white">Total</h5>
-                                        </div>
-                                        <div class="col-6 text-right">
-                                            <h5 class="text-white"><strong>@Model.OrderHeader.OrderTotal.ToString("c")</strong></h5>
-                                        </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item bg-success">
+                                <div class="row container">
+                                    <div class="col-6">
+                                        <h5 class="text-white">Total</h5>
                                     </div>
-                                </li>
-                            </ul>
+                                    <div class="col-6 text-right">
+                                        <h5 class="text-white"><strong>@Model.OrderHeader.OrderTotal.ToString("c")</strong></h5>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
 
-                            @if (!Model.IsCustomer)
-                            {
-                                // Admin and Employee
-                                <a hidden=@(!(Model.OrderHeader.OrderStatus == SD.StatusPending))
-                               class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusInProcess)">Start Processing</a>
+                        @if (!Model.IsCustomer)
+                        {
+                            // Admin and Employee
+                            <a hidden=@(!(Model.OrderHeader.OrderStatus == SD.StatusPending)) onclick="return ValidateInput()"
+                           class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusApproved)">Approve Order</a>
 
-                                <a hidden=@(!(Model.OrderHeader.OrderStatus == SD.StatusInProcess))
-                               class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusApproved)">Approve Order</a>
+                            <a hidden=@(!(Model.OrderHeader.OrderStatus == SD.StatusApproved)) onclick="return ValidateInput()"
+                           class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusInProcess)">Start Processing</a>
 
-                                <a hidden=@(!(Model.OrderHeader.OrderStatus == SD.StatusApproved))
-                               class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusShipped)">Ship Order</a>
+                            <a hidden=@(!(Model.OrderHeader.OrderStatus == SD.StatusInProcess)) onclick="return ValidateInput()"
+                           class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusShipped)">Ship Order</a>
 
-                                <a hidden=@(!(Model.OrderHeader.OrderStatus == SD.StatusShipped))
-                               class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusCompleted)">Complete Order</a>
+                            <a hidden=@(!(Model.OrderHeader.OrderStatus == SD.StatusShipped)) onclick="return ValidateInput()"
+                           class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusCompleted)">Complete Order</a>
+                        }
+                        else if (Model.OrderHeader.User.CompanyId != null && Model.OrderHeader.User.CompanyId > 0)
+                        {
+                            <form method="post" asp-action="PayNow" asp-controller="Order" asp-area="Admin">
+                                <input hidden asp-for="OrderHeader.Id" />
+                                <input type="submit" hidden=@(!(Model.OrderHeader.PaymentStatus == SD.PaymentStatusDelayedPayment))
+                                   class="btn btn-primary form-control my-1" value="Pay Now" />
+                            </form>
+                        }
+                        <a hidden=@(!isVisibleRefund)
+                           class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusRefunded)">Refund Order</a>
 
-                                <a href="@(statusButtonHref + SD.StatusCancelled)"
-                               hidden=@(Model.OrderHeader.OrderStatus == SD.StatusCancelled || Model.OrderHeader.OrderStatus == SD.StatusRefunded )
-                               class="btn btn-danger form-control my-1">Cancel Order</a>
-
-                            }
-                            else if (Model.OrderHeader.User.CompanyId != null && Model.OrderHeader.User.CompanyId > 0)
-                            {
-                                <input type="submit" hidden=@(Model.OrderHeader.PaymentStatus == SD.PaymentStatusPending) class="btn btn-success form-control my-1" value="Pay Now" />
-                            }
-                            <a hidden=@(!(Model.OrderHeader.OrderStatus == SD.StatusCancelled))
-                               class="btn btn-primary form-control my-1" href="@(statusButtonHref + SD.StatusRefunded)">Refund Order</a>
-                        </div>
+                        <a href="@(statusButtonHref + SD.StatusCancelled)"
+                           hidden=@(Model.OrderHeader.OrderStatus == SD.StatusCancelled || Model.OrderHeader.OrderStatus == SD.StatusRefunded )
+                           class="btn btn-danger form-control my-1">Cancel Order</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</form>
+</div>
+
+
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+<script>
+    function ValidateInput() {
+        if(document.querySelector("#trackingNumber").value == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Tracking number is required!',
+                })
+            return false;
+        }
+        return true;
+    }
+    function ValidateInput() {
+        if(document.querySelector("#carrier").value == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Carrier is required!',
+                })
+            return false;
+        }
+        return true;
+    }
+</script>
+}

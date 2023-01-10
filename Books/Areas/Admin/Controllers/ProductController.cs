@@ -5,12 +5,15 @@ using Books.Model;
 using Books.Model.PaginationModel;
 using Books.Model.ViewModel;
 using Books.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Model.Utility;
 
 namespace Books.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class ProductController : Controller
     {
         private readonly IBusinessLogic _businessLogic;

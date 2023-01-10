@@ -8,6 +8,6 @@ namespace Books.BusinessLogic.IBusinessLogic
     {
         public PaginatedOrderHeader HandleGetAllProductsWithPagination(PaginatedOrderHeader paginationModel);
         public void UpdateDetailInformation(OrderHeader orderHeader);
-        public void UpdateOrderStatus(int orderId, string nextStatus);
+        public void UpdateOrderStatus(int orderId, string nextStatus, string updatedById);
     }
 }

@@ -3,6 +3,7 @@ using Books.Data;
 using Books.DataAcess.Repository;
 using Books.Model;
 using Books.Service;
+using Books.Service.IService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProvid
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 builder.Services.AddScoped<IBusinessLogic, BusinessLogic>();
+builder.Services.AddSingleton<IStripeService, StripeService>();
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
 builder.Services.AddMvc();
 builder.Services.ConfigureApplicationCookie(options =>

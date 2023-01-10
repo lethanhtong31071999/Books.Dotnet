@@ -9,14 +9,12 @@ namespace Books.Service
 {
     public class ShoppingCartService : IShoppingCartService
     {
-        public ShoppingCartService()
-        {
-        }
-
+        private readonly IStripeService _stripeService;
         private readonly IUnitOfWork _unit;
-        public ShoppingCartService(IUnitOfWork unit)
+        public ShoppingCartService(IUnitOfWork unit, IStripeService stripeService)
         {
             _unit = unit;
+            _stripeService = stripeService;
         }
 
         public bool UpsertShoppingCart(ShoppingCart obj)
@@ -70,10 +68,10 @@ namespace Books.Service
                 };
 
                 // Company dont need to pay for orders in advance
-                if(applicationUser.CompanyId != null && applicationUser.CompanyId > 0)
+                if (applicationUser.CompanyId != null && applicationUser.CompanyId > 0)
                 {
                     orderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
-                    orderHeader.OrderStatus = SD.StatusApproved;
+                    orderHeader.OrderStatus = SD.StatusPending;
                 }
 
                 // Add OrderHeader
@@ -100,47 +98,30 @@ namespace Books.Service
                 _unit.OrderDetailRepo.AddRange(orderDetails.AsEnumerable<OrderDetail>());
                 _unit.Save();
 
-                // For Company user
-                if(applicationUser.CompanyId != null && applicationUser.CompanyId > 0)
+                // Stripe
+                if (applicationUser.CompanyId != null && applicationUser.CompanyId > 0)
                 {
+                    // For Company user
                     obj.OrderHeader.Id = orderHeader.Id;
                     return null;
                 }
-
-                // Stripe for all type of customer except for Company
-                var lineItems = new List<SessionLineItemOptions>();
-                foreach (var item in shoppingCarts)
+                else
                 {
-                    lineItems.Add(new SessionLineItemOptions()
+                    // For all type of customer except for Company
+                    var paymentStripe = shoppingCarts.Select(x => new PaymentStripe()
                     {
-                        Quantity = item.Count,
-                        PriceData = new SessionLineItemPriceDataOptions()
-                        {
-                            Currency = "usd",
-                            UnitAmount = (long)item.FinalPrice * 100,
-                            ProductData = new SessionLineItemPriceDataProductDataOptions()
-                            {
-                                Name = item.Product.Title,
-                                Description = item.Product.Description,
-                            }
-                        }
-                    });
+                        Product = x.Product,
+                        Count = x.Count,
+                        FinalPrice= x.FinalPrice,
+                    }).AsEnumerable();
+                    var session = _stripeService.Payment(paymentStripe, orderHeader.Id);
+                    orderHeader.SessionId = session.Id;
+                    _unit.OrderHeaderRepo.Update(orderHeader);
+                    _unit.Save();
+                    return session;
                 }
-                var domain = "https://localhost:44330";
-                var options = new SessionCreateOptions
-                {
-                    LineItems = lineItems,
-                    Mode = "payment",
-                    SuccessUrl = @$"{domain}/Customer/Cart/OrderConfirmation?id={orderHeader.Id}",
-                    CancelUrl = @$"{domain}/customer/Cart/Index?orderId={orderHeader.Id}",
-                };
-                var service = new SessionService();
-                var session = service.Create(options);
 
-                orderHeader.SessionId = session.Id;
-                _unit.OrderHeaderRepo.Update(orderHeader);
-                _unit.Save();
-                return session;
+
             }
             catch (Exception)
             {

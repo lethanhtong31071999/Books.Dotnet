@@ -37,6 +37,7 @@ namespace Books.DataAcess.Repository
             }
         }
 
+
         public void UpdateStripePayment(int id, string sessionId, string paymentIntentId)
         {
             var orderHeader = base.GetFirstOrDefault(x => id == x.Id);
@@ -57,6 +58,9 @@ namespace Books.DataAcess.Repository
                 switch (pagingModel.Status)
                 {
                     case "pending":
+                        query = query.Where(x => x.OrderStatus == SD.StatusPending);
+                        break;
+                    case "paymentpending":
                         query = query.Where(x => x.PaymentStatus == SD.PaymentStatusPending);
                         break;
                     case "completed":

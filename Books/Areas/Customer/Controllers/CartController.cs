@@ -21,17 +21,15 @@ namespace Books.Areas.Customer.Controllers
         {
             _unit = unit;
             _businessLogic = businessLogic;
-            Stripe.StripeConfiguration.ApiKey
-                = "sk_test_51MM8LjFpSwCTDFNnB2stop6Qtxws02R3C8LOYIRm5Z66ejekrkEDcauTP0jkdxOugRxnUxGvmvTMA0IKaNmeNgl000jzQ4uK4N";
         }
         public IActionResult Index(int? orderId)
         {
             // Remove order from Dba when customer cancel payment
-            if(orderId != null)
+            if (orderId != null)
             {
-                var orderHeaderFromDba = _unit.OrderHeaderRepo.GetFirstOrDefault(x => x.Id == orderId);
+                var orderHeaderFromDba = _unit.OrderHeaderRepo.GetFirstOrDefault(x => x.Id == orderId, includedProps: "User");
                 var orderDetailsFromDba = _unit.OrderDetailRepo.GetAllWithCondition(x => x.OrderHeaderId == orderId).AsEnumerable<OrderDetail>();
-                if (orderHeaderFromDba != null)
+                if (orderHeaderFromDba != null && orderHeaderFromDba.User.CompanyId == null)
                 {
                     _unit.OrderHeaderRepo.Remove(orderHeaderFromDba);
                     _unit.OrderDetailRepo.RemoveRange(orderDetailsFromDba);
@@ -147,30 +145,27 @@ namespace Books.Areas.Customer.Controllers
         public IActionResult OrderConfirmation(int id)
         {
             var orderHeader = _unit.OrderHeaderRepo.GetFirstOrDefault(x => x.Id == id, includedProps: "User");
-            if (orderHeader != null && orderHeader.User != null)
+            if (orderHeader != null && orderHeader.User != null && !String.IsNullOrEmpty(orderHeader.SessionId))
             {
+                var service = new SessionService();
+                var session = service.Get(orderHeader.SessionId);
+                // Update the stripe status 
+                if (session.PaymentStatus.ToLower() == "paid")
+                {
+                    _unit.OrderHeaderRepo.UpdateStatus(id, SD.StatusPending, SD.PaymentStatusApproved);
+                    _unit.OrderHeaderRepo.UpdateStripePayment(orderHeader.Id, session.Id, session.PaymentIntentId);
+                    _unit.Save();
+                }
                 // For all customers except for company
                 if (orderHeader.User.CompanyId == null || orderHeader.User.CompanyId == 0)
                 {
-                    // Add Status stripe
-                    var service = new SessionService();
-                    var session = service.Get(orderHeader.SessionId);
-
-                    // Update the stripe status 
-                    if (session.PaymentStatus.ToLower() == "paid")
-                    {
-                        _unit.OrderHeaderRepo.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
-                        _unit.OrderHeaderRepo.UpdateStripePayment(orderHeader.Id, session.Id, session.PaymentIntentId);
-                        _unit.Save();
-                    }
+                    // Remove Shopping Cart List from Dba
+                    var ShoppingCarts = _unit.ShoppingCartRepo
+                        .GetAllWithCondition(x => x.UserId == orderHeader.UserId)
+                        .AsEnumerable<ShoppingCart>();
+                    _unit.ShoppingCartRepo.RemoveRange(ShoppingCarts);
+                    _unit.Save();
                 }
-
-                // Remove Shopping Cart List from Dba
-                var ShoppingCarts = _unit.ShoppingCartRepo
-                    .GetAllWithCondition(x => x.UserId == orderHeader.UserId)
-                    .AsEnumerable<ShoppingCart>();
-                _unit.ShoppingCartRepo.RemoveRange(ShoppingCarts);
-                _unit.Save();
             }
             return View(id);
         }
