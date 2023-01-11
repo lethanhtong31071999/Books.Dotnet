@@ -29,6 +29,11 @@ namespace Model.Utility
         public const string PaymentStatusDelayedPayment = "ApprovedForDelayedPayment";
         public const string PaymentStatusRejected = "Rejected";
 
-        public const string SessionCart = "SessionShoppingCart";
+        public const string SessionCart = "SessionBookStoreCart";
+
+        public const string EmailSendFrom = "BookStore@lethanhtong.com";
+        public const string ConfirmationBuyingSubject = "Confirmation Buying Product";
+        public const string ConfirmationPaymentSubject = "Confirmation Payment Product";
+        public const string ConfirmationCancelSubject = "Confirmation Cancel Product";
     }
 }

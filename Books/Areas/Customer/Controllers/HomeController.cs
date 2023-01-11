@@ -32,7 +32,6 @@ namespace Books.Controllers
                 page = 1;
                 ViewBag.CurrentSearch = searchTxt;
             }
-
             return View(products.ToPagedList(pageNumber, pageSize));
         }
 
@@ -69,6 +68,10 @@ namespace Books.Controllers
                 obj.UserId = claim.Value;
                 if(_businessLogic.ShoppingCartService.UpsertShoppingCart(obj))
                 {
+                    var totalItemCart = _unit.ShoppingCartRepo
+                        .GetAllWithCondition(x => x.UserId == obj.UserId)
+                        .Sum(x => x.Count);
+                    HttpContext.Session.SetInt32(SD.SessionCart, totalItemCart);
                     var product = _unit.ProductRepo.GetFirstOrDefault(x => x.Id == obj.ProductId);
                     TempData["success"] = $"Added {product.Title} with {obj.Count} items to cart successfully!";
                 }

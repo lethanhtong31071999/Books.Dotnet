@@ -103,6 +103,11 @@ namespace Books.Service
                 {
                     // For Company user
                     obj.OrderHeader.Id = orderHeader.Id;
+                    var ShoppingCarts = _unit.ShoppingCartRepo
+                        .GetAllWithCondition(x => x.UserId == orderHeader.UserId)
+                        .AsEnumerable<ShoppingCart>();
+                    _unit.ShoppingCartRepo.RemoveRange(ShoppingCarts);
+                    _unit.Save();
                     return null;
                 }
                 else

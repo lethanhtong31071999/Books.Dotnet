@@ -2,7 +2,9 @@
 using Books.DataAcess.Repository;
 using Books.Model;
 using Books.Model.ViewModel;
+using Books.Service.EmailService;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Model.Utility;
 using Stripe.Checkout;
@@ -16,11 +18,13 @@ namespace Books.Areas.Customer.Controllers
     {
         private readonly IUnitOfWork _unit;
         private readonly IBusinessLogic _businessLogic;
+        private readonly IEmailSender _emailSender;
         private ShoppingCartVM _shoppingCartVM;
-        public CartController(IUnitOfWork unit, IBusinessLogic businessLogic)
+        public CartController(IUnitOfWork unit, IBusinessLogic businessLogic, IEmailSender emailSender)
         {
             _unit = unit;
             _businessLogic = businessLogic;
+            _emailSender = emailSender;
         }
         public IActionResult Index(int? orderId)
         {
@@ -59,14 +63,19 @@ namespace Books.Areas.Customer.Controllers
         {
             if (cartId != null)
             {
-                var objFromDba = _unit.ShoppingCartRepo.GetFirstOrDefault(x => x.Id == cartId);
+                var objFromDba = _unit.ShoppingCartRepo.GetFirstOrDefault(x => x.Id == cartId, includedProps:"User");
                 if (objFromDba != null)
                 {
                     _unit.ShoppingCartRepo.IncrementCount(objFromDba, 1);
                     _unit.Save();
+                    var claimsIdentity = (ClaimsIdentity)User.Identity;
+                    var claims = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+                    var totalItemCart = _unit.ShoppingCartRepo
+                        .GetAllWithCondition(x => x.UserId == objFromDba.User.Id).Sum(x => x.Count);
+                    HttpContext.Session.SetInt32(SD.SessionCart, totalItemCart);
                 }
             }
-            TempData["error"] = "Something went wrong!";
+            else TempData["error"] = "Something went wrong!";
             return RedirectToAction("Index");
         }
 
@@ -74,24 +83,28 @@ namespace Books.Areas.Customer.Controllers
         {
             if (cartId != null)
             {
-                var objFromDba = _unit.ShoppingCartRepo.GetFirstOrDefault(x => x.Id == cartId);
+                var objFromDba = _unit.ShoppingCartRepo.GetFirstOrDefault(x => x.Id == cartId, includedProps: "User");
                 if (objFromDba != null)
                 {
                     _unit.ShoppingCartRepo.DecrementCount(objFromDba, 1);
                     _unit.Save();
+                    var totalItemCart = _unit.ShoppingCartRepo.GetAllWithCondition(x => x.UserId == objFromDba.User.Id).Sum(x => x.Count);
+                    HttpContext.Session.SetInt32(SD.SessionCart, totalItemCart);
                 }
             }
-            TempData["error"] = "Something went wrong!";
+            else TempData["error"] = "Something went wrong!";
             return RedirectToAction("Index");
         }
 
         public IActionResult Delete(int? cartId)
         {
-            var objFromDba = _unit.ShoppingCartRepo.GetFirstOrDefault(x => x.Id == cartId);
+            var objFromDba = _unit.ShoppingCartRepo.GetFirstOrDefault(x => x.Id == cartId, includedProps: "User");
             if (objFromDba != null)
             {
                 _unit.ShoppingCartRepo.Remove(objFromDba);
                 _unit.Save();
+                var totalItemCart = _unit.ShoppingCartRepo.GetAllWithCondition(x => x.UserId == objFromDba.User.Id).Sum(x => x.Count);
+                HttpContext.Session.SetInt32(SD.SessionCart, totalItemCart);
                 TempData["success"] = $"Removed successfully";
             }
             return RedirectToAction("Index");
@@ -136,7 +149,13 @@ namespace Books.Areas.Customer.Controllers
             if (applicationUser != null)
             {
                 var session = _businessLogic.ShoppingCartService.HandleAddSummary(obj, applicationUser);
-                if (session == null) return RedirectToAction("OrderConfirmation", "Cart", new { id = obj.OrderHeader.Id });
+
+                // For company
+                if (session == null)
+                {
+                    return RedirectToAction("OrderConfirmation", "Cart", new { id = obj.OrderHeader.Id });
+                }
+                // For other roles
                 Response.Headers.Add("Location", session.Url);
             }
             return new StatusCodeResult(303);
@@ -145,6 +164,7 @@ namespace Books.Areas.Customer.Controllers
         public IActionResult OrderConfirmation(int id)
         {
             var orderHeader = _unit.OrderHeaderRepo.GetFirstOrDefault(x => x.Id == id, includedProps: "User");
+            var htmlMessage = new HtmlMessage(_unit);
             if (orderHeader != null && orderHeader.User != null && !String.IsNullOrEmpty(orderHeader.SessionId))
             {
                 var service = new SessionService();
@@ -156,17 +176,24 @@ namespace Books.Areas.Customer.Controllers
                     _unit.OrderHeaderRepo.UpdateStripePayment(orderHeader.Id, session.Id, session.PaymentIntentId);
                     _unit.Save();
                 }
-                // For all customers except for company
-                if (orderHeader.User.CompanyId == null || orderHeader.User.CompanyId == 0)
-                {
-                    // Remove Shopping Cart List from Dba
-                    var ShoppingCarts = _unit.ShoppingCartRepo
-                        .GetAllWithCondition(x => x.UserId == orderHeader.UserId)
-                        .AsEnumerable<ShoppingCart>();
-                    _unit.ShoppingCartRepo.RemoveRange(ShoppingCarts);
-                    _unit.Save();
-                }
+
+                // Send email confirmation payment successfully
+                _emailSender.SendEmailAsync(orderHeader.User.Email, SD.ConfirmationPaymentSubject, htmlMessage.Payment(orderHeader));
             }
+            else if (orderHeader != null && orderHeader.User != null && orderHeader.User.CompanyId != null)
+            {
+                // Send email notification order
+                _emailSender.SendEmailAsync(orderHeader.User.Email, SD.ConfirmationBuyingSubject, htmlMessage.Buy(orderHeader));
+            }
+
+            // Remove Shopping Cart List from Dba
+            var ShoppingCarts = _unit.ShoppingCartRepo
+                .GetAllWithCondition(x => x.UserId == orderHeader.UserId)
+                .AsEnumerable<ShoppingCart>();
+            _unit.ShoppingCartRepo.RemoveRange(ShoppingCarts);
+            _unit.Save();
+            var totalItemCart = _unit.ShoppingCartRepo.GetAllWithCondition(x => x.UserId == orderHeader.User.Id).Sum(x => x.Count);
+            HttpContext.Session.SetInt32(SD.SessionCart, totalItemCart);
             return View(id);
         }
 
